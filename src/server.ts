@@ -1,5 +1,5 @@
 /* External dependencies */
-import express from 'express'
+import * as express from 'express'
 
 /* Internal dependencies */
 import test from './routes/test'
