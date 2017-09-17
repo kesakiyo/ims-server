@@ -58,3 +58,4 @@ typings/
 dist/
 .env
 .idea
+apidoc/dist/
