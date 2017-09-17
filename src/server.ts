@@ -1,18 +1,18 @@
 /* External dependencies */
-import * as express from 'express'
+import * as express from 'express';
+import { Express, Router } from 'express';
 
 /* Internal dependencies */
-import test from './routes/test'
+import test from './routes/test';
 
-const app = express()
-const router = express.Router()
+const app: Express = express();
+const router: Router = express.Router();
 
-app.use('/v1', (() => {
-  router.use('/test', test)
+app.use('/v1', ((): Router => {
+  router.use('/test', test);
+  return router;
+})());
 
-  return router
-})())
-
-app.listen(3000, () => {
+app.listen(3000, (): void => {
   console.log('ims-server app listening on port 3000')
-})
+});
