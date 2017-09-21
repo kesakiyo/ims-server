@@ -14,7 +14,7 @@ const app: Express = express();
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json());
 
-mongoose.connect(config.mongoURL, { useMongoClient: true, promiseLibrary: global.Promise }, (err): void => {
+mongoose.connect(config.MONGO_URL, { useMongoClient: true, promiseLibrary: global.Promise }, (err): void => {
   if (err) {
     console.log('Occurred the error when connecting mongodb: ', err);
   }

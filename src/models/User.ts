@@ -1,6 +1,10 @@
 /* External dependencies */
 import * as mongoose from 'mongoose';
 import { Schema, Model, Document } from 'mongoose';
+import * as bcrypt from 'bcrypt'
+
+/* Internal dependencies */
+import config from '../config'
 
 const userSchema: Schema = new mongoose.Schema({
   email: {
@@ -13,6 +17,35 @@ const userSchema: Schema = new mongoose.Schema({
     required: true,
   },
 });
+
+userSchema.pre('save', function save(next) {
+  const user = this;
+
+  if (!user.isModified('password')) {
+    return next();
+  }
+
+  bcrypt.genSalt(config.SALT_WORK_FACTOR, (err, salt) => {
+    if (err) {
+      return next(err);
+    }
+
+    bcrypt.hash(user.password, salt, (err, hash) => {
+      if (err) {
+        return next(err);
+      }
+
+      user.password = hash;
+      next();
+    });
+  });
+});
+
+userSchema.methods.comparePassword = function (candidatePassword: string, cb: (err: any, isMatch: boolean) => {}) {
+  bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {
+    cb(err, isMatch);
+  });
+};
 
 const User: Model<Document> = mongoose.model('User', userSchema);
 
