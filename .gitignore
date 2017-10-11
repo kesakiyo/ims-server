@@ -61,4 +61,4 @@ dist/
 apidoc/dist/
 
 # configuration
-src/config.ts
+src/config/secret.ts
