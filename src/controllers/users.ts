@@ -46,12 +46,24 @@ router.post('/', (req: Request, res: Response, next: NextFunction): void => {
   })
 });
 
+/**
+ * @api {post} /v1/users Sign In
+ * @apiGroup User
+ * @apiName Sign In
+ * @apiDescription Sign In with email and password
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *    {
+ *        email: 'string'
+ *    }
+ */
 router.post('/signin', (req: Request, res: Response, next: NextFunction) => {
   passport.authenticate('local', (err: Error, user: UserModel, info: LocalStrategyInfo) => {
     if (err) {
       return next(err);
     }
 
+    // todo: user를 왜 못찾았는지에 대한 정확한 정보를 전달해 줄 필요가 있음.
     if (!user) {
       return res.status(HttpStatus.UNPROCESSABLE_ENTITY).send({
         error: 'Not found user',
@@ -65,7 +77,22 @@ router.post('/signin', (req: Request, res: Response, next: NextFunction) => {
 
       res.status(200).json(user);
     })
-  })
+  })(req, res, next);
 });
+
+/**
+ * @api {post} /v1/users Sign Out
+ * @apiGroup User
+ * @apiName Sign Out
+ * @apiDescription Sign out
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *    {
+ *    }
+ */
+router.delete('/signout', (req: Request, res: Response, next: NextFunction) => {
+  req.logOut();
+  res.status(HttpStatus.OK).send();
+})
 
 export default router;
