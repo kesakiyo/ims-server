@@ -4,7 +4,15 @@ import { Schema, Model, Document } from 'mongoose';
 import * as bcrypt from 'bcrypt'
 
 /* Internal dependencies */
-import config from '../config'
+import secret from '../config/secret'
+
+export type UserModel = mongoose.Document & {
+  email: string,
+  password: string,
+
+  comparePassword: (candidatePassword: string, cb: (err: any, isMatch: any) => {}) => void,
+  gravatar: (size: number) => string
+};
 
 const userSchema: Schema = new mongoose.Schema({
   email: {
@@ -25,7 +33,7 @@ userSchema.pre('save', function save(next) {
     return next();
   }
 
-  bcrypt.genSalt(config.SALT_WORK_FACTOR, (err, salt) => {
+  bcrypt.genSalt(secret.SALT_WORK_FACTOR, (err, salt) => {
     if (err) {
       return next(err);
     }
