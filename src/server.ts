@@ -15,6 +15,8 @@ import secret from './config/secret';
 /* API keys and Passport configuration. */
 import passportConfig from './config/passport';
 
+process.env.TZ = 'Asia/Seoul';
+
 /* Connect to mongodb */
 mongoose.connect(secret.MONGO_URL, { useMongoClient: true, promiseLibrary: global.Promise }, (err): void => {
   if (err) {

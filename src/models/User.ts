@@ -5,13 +5,13 @@ import * as bcrypt from 'bcrypt'
 
 /* Internal dependencies */
 import secret from '../config/secret'
+import setTimestamps from './plugins/setTimestamps';
 
 export type UserModel = mongoose.Document & {
-  email: string,
-  password: string,
+  email: String,
+  password: String,
 
-  comparePassword: (candidatePassword: string, cb: (err: any, isMatch: any) => {}) => void,
-  gravatar: (size: number) => string
+  comparePassword: (candidatePassword: String, cb: (err: any, isMatch: any) => {}) => void
 };
 
 const userSchema: Schema = new mongoose.Schema({
@@ -25,6 +25,9 @@ const userSchema: Schema = new mongoose.Schema({
     required: true,
   },
 });
+
+// todo: 추후 Global 하게 등록할 수 있는 방법 생각...
+userSchema.plugin(setTimestamps);
 
 userSchema.pre('save', function save(next) {
   const user = this;
