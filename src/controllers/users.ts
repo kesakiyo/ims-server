@@ -41,7 +41,7 @@ router.post('/', (req: Request, res: Response, next: NextFunction): void => {
       if (err) {
         return next(err);
       }
-      res.status(HttpStatus.OK).send(user.toJSON())
+      res.status(HttpStatus.OK).send('ok')
     })
   })
 });
