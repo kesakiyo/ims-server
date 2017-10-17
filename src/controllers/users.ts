@@ -35,6 +35,7 @@ router.post('/', (req: Request, res: Response, next: NextFunction): void => {
 
     if (existingUser) {
       res.status(HttpStatus.UNPROCESSABLE_ENTITY).send({ message: "Account with that email address already exists." });
+      return null;
     }
 
     user.save((err): void => {
