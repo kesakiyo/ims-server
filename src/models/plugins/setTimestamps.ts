@@ -16,7 +16,6 @@ export default (schema: Schema) => {
   })
   
   schema.pre('save', function(next: NextFunction) {
-    console.log('hello', this);
     this.updatedAt = getCurrentTime();
     if (!this.createdAt) {
       this.createdAt = getCurrentTime();

@@ -27,6 +27,7 @@ mongoose.connect(secret.MONGO_URL, { useMongoClient: true, promiseLibrary: globa
 /* Create Express Server */
 const app: Express = express();
 
+/* Apply Middleware */
 app.use(compression());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -40,6 +41,7 @@ app.use(passport.session());
 
 passportConfig.initizliaer(passport);
 
+/* Setting for router */
 app.use('/v1', ((): Router => {
   const router: Router = express.Router();
 
@@ -49,6 +51,7 @@ app.use('/v1', ((): Router => {
   return router;
 })());
 
+/* Start app */
 app.listen(3000, (): void => {
   console.log('ims-server app listening on port 3000');
 });
