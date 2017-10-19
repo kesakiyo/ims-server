@@ -14,6 +14,10 @@ export default (schema: Schema, options: { schemaName: String }) => {
   })
   
   schema.pre('save', function(next: NextFunction) {
+    if (this.id) {
+      return next();
+    }
+    
     const query = IdCounter.findOneAndUpdate({
       _id: options.schemaName 
     }, { 
