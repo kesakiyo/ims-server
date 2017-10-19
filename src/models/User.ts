@@ -10,8 +10,12 @@ import setAutoIncId from './plugins/setAutoIncId';
 import hideField from './plugins/hideField';
 
 export type UserModel = mongoose.Document & {
-  email: String,
-  password: String,
+  _id: string,
+  id: number,
+  email: string,
+  password: string,
+  createdAt: number,
+  updatedAt: number,
 
   comparePassword: (candidatePassword: String, cb: (err: any, isMatch: any) => {}) => void
 };

@@ -3,6 +3,7 @@ import * as express from 'express';
 import { Express, Router } from 'express';
 import * as bodyParser from 'body-parser';
 import * as mongoose from 'mongoose';
+import * as connectMongo from 'connect-mongo';
 import * as compression from 'compression';
 import * as session from 'express-session';
 import * as passport from 'passport';
@@ -10,6 +11,7 @@ import * as passport from 'passport';
 /* Internal dependencies */
 import test from './controllers/test';
 import users from './controllers/users';
+import sessions from './controllers/sessions';
 import secret from './config/secret';
 
 /* API keys and Passport configuration. */
@@ -27,12 +29,19 @@ mongoose.connect(secret.MONGO_URL, { useMongoClient: true, promiseLibrary: globa
 /* Create Express Server */
 const app: Express = express();
 
+/* Mongo Store for persistent session */
+const MongoStore = connectMongo(session);
+
 /* Apply Middleware */
 app.use(compression());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(session({
-  resave: true,
+  store: new MongoStore({
+    mongooseConnection: mongoose.connection,
+    collection: 'signin-sessions',
+  }),
+  resave: false,
   saveUninitialized: true,
   secret: secret.SESSION_SECERET,
 }));
@@ -47,6 +56,7 @@ app.use('/v1', ((): Router => {
 
   router.use('/test', test);
   router.use('/users', users);
+  router.use('/sessions', sessions);
   
   return router;
 })());

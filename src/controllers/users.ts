@@ -21,7 +21,9 @@ const router: Router = express.Router();
  * @apiSuccessExample {json} Success-Response:
  *    {
  *        id: 'number',
- *        email: 'string'
+ *        email: 'string',
+ *        createdAt: 'number',
+ *        updatedAt: 'number'
  *    }
  */
 router.post('/', (req: Request, res: Response, next: NextFunction): void => {
@@ -59,6 +61,8 @@ router.post('/', (req: Request, res: Response, next: NextFunction): void => {
  *    {
  *        id: 'number',
  *        email: 'string'
+ *        createdAt: 'number',
+ *        updatedAt: 'number'
  *    }
  */
 router.post('/signin', (req: Request, res: Response, next: NextFunction) => {
@@ -101,13 +105,15 @@ router.delete('/signout', (req: Request, res: Response, next: NextFunction) => {
 /**
  * @api {post} /v1/users/me Get Me
  * @apiGroup Users
- * @apiName me
+ * @apiName Get me
  * @apiDescription Reuqest user to server, If you don't sign in, server sends error code.
  *
  * @apiSuccessExample {json} Success-Response:
  *    {
  *        id: 'number',
- *        email: 'string'
+ *        email: 'string',
+ *        createdAt: 'number',
+ *        updatedAt: 'number'
  *    }
  */
 router.get('/me', passportConfig.isAuthenticated, (req: Request, res: Response): void => {
