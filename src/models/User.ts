@@ -1,12 +1,13 @@
 /* External dependencies */
 import * as mongoose from 'mongoose';
 import { Schema, Model, Document } from 'mongoose';
-import * as bcrypt from 'bcrypt'
+import * as bcrypt from 'bcrypt';
 
 /* Internal dependencies */
 import secret from '../config/secret'
 import setTimestamps from './plugins/setTimestamps';
 import setAutoIncId from './plugins/setAutoIncId';
+import hideField from './plugins/hideField';
 
 export type UserModel = mongoose.Document & {
   email: String,
@@ -24,12 +25,14 @@ const userSchema: Schema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
+    hidden: true,
   },
 });
 
 // todo: 추후 Global 하게 등록할 수 있는 방법 생각...
 userSchema.plugin(setTimestamps);
 userSchema.plugin(setAutoIncId, { schemaName: 'UserId' });
+userSchema.plugin(hideField);
 
 userSchema.pre('save', function save(next) {
   const user = this;

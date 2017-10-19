@@ -15,7 +15,7 @@ const initizliaer = (passport: passport.Passport) => {
   });
     
   passport.deserializeUser((id, done) => {
-    User.findById(id, (err, user) => {
+    User.findOne({ id }, (err, user) => {
       done(err, user);
     });
   });
