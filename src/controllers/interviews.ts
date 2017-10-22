@@ -118,7 +118,7 @@ router.post('/', passportConfig.isAuthenticated, (req: Request, res: Response, n
       interview: savedInterview._id,
     })
 
-    session.save((err, savedSession): void => {
+    session.save((err: Error, savedSession: SessionModel): void => {
       if (err) {
         return next(err);
       }
