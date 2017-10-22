@@ -31,7 +31,11 @@ const router: Router = express.Router();
  */
 router.get('/', passportConfig.isAuthenticated, (req: Request, res: Response, next: NextFunction): void => {
   Session
-    .findOne({ user: req.user._id })
+    .find({
+      userId: {
+        $in: req.user.id,
+      }
+    })
     .sort({ cratedAt: -1 })
     .exec((err: Error, result: SessionModel[]) => {
       if (err) {
@@ -61,11 +65,11 @@ router.get('/', passportConfig.isAuthenticated, (req: Request, res: Response, ne
 router.post('/', passportConfig.isAuthenticated, (req: Request, res: Response, next: NextFunction): void => {
 
   const session: Document = new Session({
-    user: req.user._id,
+    userId: req.user.id,
     role: req.body.role,
   })
 
-  Session.findOne({ user: req.user._id }, (err, existingUser): void => {
+  Session.findOne({ userId: req.user.id }, (err, existingUser): void => {
     if (err) {
       return next(err);
     }
@@ -75,14 +79,12 @@ router.post('/', passportConfig.isAuthenticated, (req: Request, res: Response, n
       return null;
     }
 
-    session.save((err): void => {
+    session.save((err: Error, result: SessionModel): void => {
       if (err) {
         return next(err);
       }
 
-      session.populate('user', (err: Error, result: SessionModel) => {
-        res.status(HttpStatus.OK).json(result);
-      })
+      res.status(HttpStatus.OK).json(result);
     })
   })
 });

@@ -34,8 +34,8 @@ const router: Router = express.Router();
  *        sessions: [
  *            id: 'number',
  *            role: 'string',
- *            user: 'User',
- *            interview: 'Interview',
+ *            userId: 'number',
+ *            interviewId: 'number',
  *            createdAt: 'number',
  *            updatedAt: 'number'
  *        ]
@@ -52,12 +52,10 @@ router.get('/', (req: Request, res: Response, next: NextFunction): void => {
 
       Session
         .find({
-          'interview': {
-            $in: interviews.map(interview => new mongoose.Types.ObjectId(interview._id)),
+          interviewId: {
+            $in: interviews.map(interview => interview.id),
           }
         })
-        .populate('user')
-        .populate('interview')
         .exec((err: Error, sessions: SessionModel[]) => {
           if (err) {
             return next(err);
@@ -91,8 +89,8 @@ router.get('/', (req: Request, res: Response, next: NextFunction): void => {
  *        session: {
  *            id: 'number',
  *            role: 'string',
- *            user: 'User',
- *            interview: 'Interview',
+ *            userId: 'number',
+ *            interviewId: 'number',
  *            createdAt: 'number',
  *            updatedAt: 'number'
  *        }
@@ -113,9 +111,9 @@ router.post('/', passportConfig.isAuthenticated, (req: Request, res: Response, n
     }
 
     const session: Document = new Session({
-      user: req.user._id,
-      role: sessionRole.INTERVIEWER,
-      interview: savedInterview._id,
+      userId: req.user.id,
+      role: sessionRole.MASTER,
+      interviewId: savedInterview.id,
     })
 
     session.save((err: Error, savedSession: SessionModel): void => {
@@ -123,18 +121,10 @@ router.post('/', passportConfig.isAuthenticated, (req: Request, res: Response, n
         return next(err);
       }
 
-      savedSession
-        .populate('user')
-        .populate('interview', (err: Error, populatedSession: SessionModel) => {
-          if (err) {
-            return next(err);
-          }
-
-          res.status(HttpStatus.OK).json({
-            interview: savedInterview,
-            session: populatedSession,
-          })
-        })
+      res.status(HttpStatus.OK).json({
+        interview: savedInterview,
+        session: savedSession,
+      })
     })
   })
 });
