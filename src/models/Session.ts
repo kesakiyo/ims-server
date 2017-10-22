@@ -13,17 +13,29 @@ export type SessionModel = mongoose.Document & {
   id: number,
   role: string,
   user: string,
+  interview: string,
   createdAt: number,
   updatedAt: number,
 };
 
 const SessionSchema: Schema = new mongoose.Schema({
   role: String,
+  interview: {
+    type: String,
+    ref: 'Interview',
+  },
   user: {
     type: String,
     ref: 'User',
   },
 });
+
+SessionSchema.index({
+  interview: 1,
+  user: 1,
+}, {
+  unique: true,
+})
 
 SessionSchema.plugin(setTimestamps);
 SessionSchema.plugin(setAutoIncId, { schemaName: 'SessionId' });

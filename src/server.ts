@@ -12,6 +12,7 @@ import * as passport from 'passport';
 import test from './controllers/test';
 import users from './controllers/users';
 import sessions from './controllers/sessions';
+import interviews from './controllers/interviews';
 import secret from './config/secret';
 
 /* API keys and Passport configuration. */
@@ -57,6 +58,7 @@ app.use('/v1', ((): Router => {
   router.use('/test', test);
   router.use('/users', users);
   router.use('/sessions', sessions);
+  router.use('/interviews', interviews);
   
   return router;
 })());
