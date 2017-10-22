@@ -22,7 +22,8 @@ const router: Router = express.Router();
  *        {
  *            id: 'number',
  *            role: 'string',
- *            user: 'User Model',
+ *            user: 'User',
+ *            interview: 'Interview',
  *            createdAt: 'number',
  *            updatedAt: 'number'
  *        }
@@ -31,9 +32,7 @@ const router: Router = express.Router();
 router.get('/', passportConfig.isAuthenticated, (req: Request, res: Response, next: NextFunction): void => {
   Session
     .findOne({ user: req.user._id })
-    .limit(25)
     .sort({ cratedAt: -1 })
-    .populate('user')
     .exec((err: Error, result: SessionModel[]) => {
       if (err) {
         return next(err);
@@ -53,7 +52,8 @@ router.get('/', passportConfig.isAuthenticated, (req: Request, res: Response, ne
  *    {
  *        id: 'number',
  *        role: 'string',
- *        user: 'User Model',
+ *        user: 'User',
+ *        interview: 'Interview',
  *        createdAt: 'number',
  *        updatedAt: 'number'
  *    }
