@@ -15,7 +15,6 @@ export type InterviewModel = mongoose.Document & {
   description: string,
   startTime: number,
   endTime: number,
-  user: string,
   createdAt: number,
   updatedAt: number,
 };
@@ -33,14 +32,6 @@ const InterviewSchema: Schema = new mongoose.Schema({
   endTime: {
     type: Number,
     required: true,
-  },
-  interview: {
-    type: String,
-    ref: 'Inteview',
-  },
-  user: {
-    type: String,
-    ref: 'User',
   },
 });
 

@@ -12,27 +12,32 @@ export type SessionModel = mongoose.Document & {
   _id: string,
   id: number,
   role: string,
-  user: string,
-  interview: string,
+  userId: number,
+  interviewId: number,
   createdAt: number,
   updatedAt: number,
 };
 
 const SessionSchema: Schema = new mongoose.Schema({
-  role: String,
-  interview: {
+  role: {
     type: String,
+    required: true,
+  },
+  interviewId: {
+    type: Number,
+    required: true,
     ref: 'Interview',
   },
-  user: {
-    type: String,
+  userId: {
+    type: Number,
+    required: true,
     ref: 'User',
   },
 });
 
 SessionSchema.index({
-  interview: 1,
-  user: 1,
+  interviewId: 1,
+  userId: 1,
 }, {
   unique: true,
 })
