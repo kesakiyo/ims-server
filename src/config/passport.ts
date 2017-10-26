@@ -1,13 +1,13 @@
-/* External dependnecies */
+// External dependnecies
 import { Request, Response, NextFunction } from 'express';
 import * as passport from 'passport';
 import * as passportLocal from 'passport-local';
 import * as HttpStatus from 'http-status-codes';
 
-/* Internal dependnecies */
+// Internal dependnecies
 import User from '../models/User';
 
-const initizliaer = (passport: passport.Passport) => {
+const initizliaer: (passport: passport.Passport) => void = (passport: passport.Passport): void => {
   const LocalStrategy = passportLocal.Strategy;
   
   passport.serializeUser<any, any>((user, done) => {

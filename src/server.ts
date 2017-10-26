@@ -1,39 +1,44 @@
-/* External dependencies */
+// External dependencies
+import * as bodyParser from 'body-parser';
+import * as compression from 'compression';
+import * as connectMongo from 'connect-mongo';
+import * as debuggerCreator from 'debug';
 import * as express from 'express';
 import { Express, Router } from 'express';
-import * as bodyParser from 'body-parser';
-import * as mongoose from 'mongoose';
-import * as connectMongo from 'connect-mongo';
-import * as compression from 'compression';
 import * as session from 'express-session';
+import * as mongoose from 'mongoose';
 import * as passport from 'passport';
 
-/* Internal dependencies */
+// Internal dependencies
+import secret from './config/secret';
+import interviews from './controllers/interviews';
+import sessions from './controllers/sessions';
 import test from './controllers/test';
 import users from './controllers/users';
-import sessions from './controllers/sessions';
-import interviews from './controllers/interviews';
-import secret from './config/secret';
 
-/* API keys and Passport configuration. */
+// API keys and Passport configuration.
 import passportConfig from './config/passport';
 
+// Time Zone setting
 process.env.TZ = 'Asia/Seoul';
 
-/* Connect to mongodb */
-mongoose.connect(secret.MONGO_URL, { useMongoClient: true, promiseLibrary: global.Promise }, (err): void => {
+const DEBUG: debuggerCreator.IDebugger = debuggerCreator('ims:debug');
+const ERROR: debuggerCreator.IDebugger = debuggerCreator('ims:error');
+
+// Connect to mongodb
+mongoose.connect(secret.MONGO_URL, { useMongoClient: true, promiseLibrary: global.Promise }, (err: {}): void => {
   if (err) {
-    console.log('Occurred the error when connecting mongodb: ', err);
+    ERROR('Occurred the error when connecting mongodb: ', err);
   }
 });
 
-/* Create Express Server */
+// Create Express Server
 const app: Express = express();
 
-/* Mongo Store for persistent session */
-const MongoStore = connectMongo(session);
+// Mongo Store for persistent session
+const MongoStore: connectMongo.MongoStoreFactory = connectMongo(session);
 
-/* Apply Middleware */
+// Apply Middleware
 app.use(compression());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -51,7 +56,7 @@ app.use(passport.session());
 
 passportConfig.initizliaer(passport);
 
-/* Setting for router */
+// Setting for router
 app.use('/v1', ((): Router => {
   const router: Router = express.Router();
 
@@ -59,11 +64,11 @@ app.use('/v1', ((): Router => {
   router.use('/users', users);
   router.use('/sessions', sessions);
   router.use('/interviews', interviews);
-  
+
   return router;
 })());
 
-/* Start app */
+// Start app
 app.listen(3000, (): void => {
-  console.log('ims-server app listening on port 3000');
+  DEBUG('ims-server app listening on port 3000');
 });
