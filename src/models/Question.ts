@@ -7,37 +7,38 @@ import setTimestamps from './plugins/setTimestamps';
 import setAutoIncId from './plugins/setAutoIncId';
 import hideField from './plugins/hideField';
 
-export type InterviewModel = mongoose.Document & {
+export type QuestionModel = mongoose.Document & {
   _id: string,
   id: number,
   title: string,
   description: string,
-  startTime: number,
-  endTime: number,
+  type: string,
+  interviewId: number,
   createdAt: number,
   updatedAt: number,
 };
 
-const InterviewSchema: Schema = new mongoose.Schema({
+const QuestionSchema: Schema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
   },
   description: String,
-  startTime: {
-    type: Number,
+  type: {
+    type: String,
     required: true,
   },
-  endTime: {
+  interviewId: {
     type: Number,
     required: true,
+    ref: 'Interview',
   },
 });
 
-InterviewSchema.plugin(setTimestamps);
-InterviewSchema.plugin(setAutoIncId, { schemaName: 'InterviewId' });
-InterviewSchema.plugin(hideField);
+QuestionSchema.plugin(setTimestamps);
+QuestionSchema.plugin(setAutoIncId, { schemaName: 'QuestionId' });
+QuestionSchema.plugin(hideField);
 
-const Interview: Model<Document> = mongoose.model('Interview', InterviewSchema);
+const Question: Model<Document> = mongoose.model('Question', QuestionSchema);
 
-export default Interview;
+export default Question;

@@ -3,7 +3,6 @@ import * as mongoose from 'mongoose';
 import { Schema, Model, Document } from 'mongoose';
 
 /* Internal dependencies */
-import secret from '../config/secret'
 import setTimestamps from './plugins/setTimestamps';
 
 export type IdCounterModel = mongoose.Document & {

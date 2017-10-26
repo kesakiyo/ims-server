@@ -8,6 +8,7 @@ import * as HttpStatus from 'http-status-codes';
 /* Internal dependencies */
 import passportConfig from '../config/passport';
 import { default as Interview, InterviewModel } from '../models/Interview';
+import { default as Question, QuestionModel } from '../models/Question';
 import { default as Session, SessionModel } from '../models/Session';
 import { default as User } from '../models/User';
 import sessionRole from '../constants/sessionRole';
@@ -128,5 +129,40 @@ router.post('/', passportConfig.isAuthenticated, (req: Request, res: Response, n
     })
   })
 });
+
+router.post('/:id/questions', passportConfig.isAuthenticated, (req: Request, res: Response, next: NextFunction): void => {
+  Session.findOne({ userId: req.user.id, interviewId: req.params.id }, (err, session: SessionModel): void => {
+    if (err) {
+      return next(err);
+    }
+
+    if (!session) {
+      res.status(HttpStatus.UNPROCESSABLE_ENTITY).send('세션을 찾을 수 없습니다.')
+      return null;
+    }
+
+    if (!session.isMaster()) {
+      res.status(HttpStatus.UNAUTHORIZED).send('권한이 없습니다. 마스터만 질문을 추가할 수 있습니다.');
+      return null;
+    }
+
+    const { title, description, type, order } = req.body
+
+    const question: Document = new Question({
+      title,
+      description,
+      type,
+      interviewId: session.interviewId,
+    })
+
+    question.save((err: Error, savedQuestion: QuestionModel): void => {
+      if (err) {
+        return next(err);
+      }
+
+      res.status(HttpStatus.OK).json(savedQuestion);
+    })
+  })
+})
 
 export default router;
