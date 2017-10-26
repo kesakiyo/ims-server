@@ -48,7 +48,7 @@ router.post('/', (req: Request, res: Response, next: NextFunction): void => {
       }
       res.status(HttpStatus.OK).send('ok')
     })
-  })
+  });
 });
 
 /**

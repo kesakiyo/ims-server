@@ -17,7 +17,7 @@ export type UserModel = mongoose.Document & {
   createdAt: number,
   updatedAt: number,
 
-  comparePassword: (candidatePassword: String, cb: (err: any, isMatch: any) => {}) => void
+  comparePassword: (candidatePassword: String, cb: (err: any, isMatch: any) => {}) => void,
 };
 
 const userSchema: Schema = new mongoose.Schema({

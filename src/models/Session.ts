@@ -3,10 +3,10 @@ import * as mongoose from 'mongoose';
 import { Schema, Model, Document } from 'mongoose';
 
 /* Internal dependencies */
-import secret from '../config/secret'
 import setTimestamps from './plugins/setTimestamps';
 import setAutoIncId from './plugins/setAutoIncId';
 import hideField from './plugins/hideField';
+import SessionRole from '../constants/sessionRole';
 
 export type SessionModel = mongoose.Document & {
   _id: string,
@@ -16,6 +16,8 @@ export type SessionModel = mongoose.Document & {
   interviewId: number,
   createdAt: number,
   updatedAt: number,
+
+  isMaster: () => boolean,
 };
 
 const SessionSchema: Schema = new mongoose.Schema({
@@ -45,6 +47,10 @@ SessionSchema.index({
 SessionSchema.plugin(setTimestamps);
 SessionSchema.plugin(setAutoIncId, { schemaName: 'SessionId' });
 SessionSchema.plugin(hideField);
+
+SessionSchema.methods.isMaster = function ():boolean {
+  return this.role === SessionRole.MASTER;
+}
 
 const Session: Model<Document> = mongoose.model('Session', SessionSchema);
 
