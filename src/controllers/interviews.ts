@@ -205,6 +205,7 @@ router.post('/:id/sessions', passportConfig.isAuthenticated, (req: Request, res:
       userId: req.user.id,
       interviewId: req.params.id,
       email: req.body.email,
+      mobileNumber: req.body.mobileNumber,
       role: req.body.role,
     });
     
