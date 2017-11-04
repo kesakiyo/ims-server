@@ -66,8 +66,8 @@ router.get('/', (req: Request, res: Response, next: NextFunction): void => {
             interviews,
             sessions,
           });
-        })
-    })
+        });
+    });
 });
 
 /**
@@ -125,11 +125,116 @@ router.post('/', passportConfig.isAuthenticated, (req: Request, res: Response, n
       res.status(HttpStatus.OK).json({
         interview: savedInterview,
         session: savedSession,
-      })
-    })
-  })
+      });
+    });
+  });
 });
 
+/**
+ * @api {get} /v1/interviews/:id/sessions get sessions of interview
+ * @apiGroup Interview
+ * @apiName get sessions of interview
+ * @apiDescription get sessions of interview
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *    {
+ *        sessions: [
+ *            {
+ *                id: 'number',
+ *                role: 'string',
+ *                userId: 'User',
+ *                interview: 'Interview',
+ *                createdAt: 'number',
+ *                updatedAt: 'number'
+ *            }
+ *        ]
+ *    }
+ */
+router.get('/:id/sessions', passportConfig.isAuthenticated, (req: Request, res: Response, next: NextFunction): void => {
+  Session.findOne({ userId: req.user.id, interviewId: req.params.id }, (err, existedSession: SessionModel): void => {
+    if (!existedSession || existedSession.isInterviewee()) {
+      res.status(HttpStatus.UNAUTHORIZED).send('권한이 없습니다.');
+      return null;
+    }
+
+    Session
+      .find({ interviewId: req.params.id })
+      .exec((err: Error, sessions: SessionModel[]) => {
+        if (err) {
+          return next(err);
+        }
+
+        res.status(HttpStatus.OK).json({ sessions })
+      });
+  });
+})
+
+/**
+ * @api {post} /v1/interviews/:id/sessions session create of interivew
+ * @apiGroup Interview
+ * @apiName join interview
+ * @apiDescription Interviewee joins to the interview 
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *    {
+ *        id: 'number',
+ *        role: 'string',
+ *        userId: 'User',
+ *        interview: 'Interview',
+ *        createdAt: 'number',
+ *        updatedAt: 'number'
+ *    }
+ */
+router.post('/:id/sessions', passportConfig.isAuthenticated, (req: Request, res: Response, next: NextFunction): void => {
+  if (req.body.role !== sessionRole.INTERVIEWEE) {
+    res.status(HttpStatus.UNPROCESSABLE_ENTITY).send(`role 은 항상 ${sessionRole.INTERVIEWEE} 이어야 합니다.`)
+    return null;
+  }
+
+  Session.findOne({ userId: req.user.id, interviewId: req.params.id }, (err, existedSession: SessionModel): void => {
+    if (err) {
+      return next(err);
+    }
+
+    if (existedSession) {
+      res.status(HttpStatus.UNPROCESSABLE_ENTITY).send('이미 참가한 인터뷰입니다.')
+      return null;
+    }
+
+    const session: Document = new Session({
+      userId: req.user.id,
+      interviewId: req.params.id,
+      email: req.body.email,
+      role: req.body.role,
+    });
+    
+    session.save((err: Error, savedSession: QuestionModel): void => {
+      if (err) {
+        return next(err);
+      }
+
+      res.status(HttpStatus.OK).json(savedSession);
+    });
+  });
+})
+
+/**
+ * @api {post} /v1/interviews/:id/questions create question of interview
+ * @apiGroup Interview
+ * @apiName create question
+ * @apiDescription Create question of interview
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *    {
+ *        id: 'number',
+ *        title: 'string',
+ *        description: 'string',
+ *        type: 'string',
+ *        interviewId: 'number',
+ *        createdAt: 'number',
+ *        updatedAt: 'number'
+ *    }
+ */
 router.post('/:id/questions', passportConfig.isAuthenticated, (req: Request, res: Response, next: NextFunction): void => {
   Session.findOne({ userId: req.user.id, interviewId: req.params.id }, (err, session: SessionModel): void => {
     if (err) {

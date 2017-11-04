@@ -6,7 +6,7 @@ import { Schema, Model, Document } from 'mongoose';
 import setTimestamps from './plugins/setTimestamps';
 import setAutoIncId from './plugins/setAutoIncId';
 import hideField from './plugins/hideField';
-import SessionRole from '../constants/sessionRole';
+import sessionRole from '../constants/sessionRole';
 
 export type SessionModel = mongoose.Document & {
   _id: string,
@@ -17,11 +17,16 @@ export type SessionModel = mongoose.Document & {
   createdAt: number,
   updatedAt: number,
 
+  isInterviewee: () => boolean,
   isMaster: () => boolean,
 };
 
 const SessionSchema: Schema = new mongoose.Schema({
   role: {
+    type: String,
+    required: true,
+  },
+  email: {
     type: String,
     required: true,
   },
@@ -48,8 +53,12 @@ SessionSchema.plugin(setTimestamps);
 SessionSchema.plugin(setAutoIncId, { schemaName: 'SessionId' });
 SessionSchema.plugin(hideField);
 
+SessionSchema.methods.isInterviewee = function ():boolean {
+  return this.role === sessionRole.INTERVIEWEE;
+}
+
 SessionSchema.methods.isMaster = function ():boolean {
-  return this.role === SessionRole.MASTER;
+  return this.role === sessionRole.MASTER;
 }
 
 const Session: Model<Document> = mongoose.model('Session', SessionSchema);
