@@ -62,3 +62,4 @@ apidoc/dist/
 
 # configuration
 src/config/secret.ts
+.DS_Store
