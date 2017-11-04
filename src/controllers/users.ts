@@ -95,7 +95,8 @@ router.post('/signin', (req: Request, res: Response, next: NextFunction) => {
  * @apiDescription Sign out
  *
  * @apiSuccessExample {json} Success-Response:
- *
+ * {
+ * }
  */
 router.delete('/signout', (req: Request, res: Response, next: NextFunction) => {
   req.logOut();
