@@ -12,6 +12,8 @@ export type SessionModel = mongoose.Document & {
   _id: string,
   id: number,
   role: string,
+  email: string,
+  mobileNumber: string,
   userId: number,
   interviewId: number,
   createdAt: number,
@@ -27,6 +29,10 @@ const SessionSchema: Schema = new mongoose.Schema({
     required: true,
   },
   email: {
+    type: String,
+    required: true,
+  },
+  mobileNumber: {
     type: String,
     required: true,
   },
