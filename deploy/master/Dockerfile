@@ -1,10 +1,11 @@
-FROM kesakiyo/ims:latest
+FROM kesakiyo/ims:server-base
 
 MAINTAINER Minho Cheon <kesakiyo@naver.com>
 
 WORKDIR /usr/src/master/ims-server
 
-RUN git pull origin master && \
+RUN git checkout master && \
+    git pull && \
     npm install
 
 EXPOSE 3000
