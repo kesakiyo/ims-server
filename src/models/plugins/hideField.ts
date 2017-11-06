@@ -4,7 +4,7 @@ import { NextFunction } from 'express';
 
 const defaultHiddenFiles: string[] = ['_id', '__v'];
 
-export default (schema: Schema, options: { fieldName: boolean }) => {
+export default (schema: any, options: { fieldName: boolean }) => {
   const deleteFieldNames: string[] = defaultHiddenFiles.concat(
     Object.keys(schema.tree).filter((key: string) => schema.tree[key].hidden)
   )
