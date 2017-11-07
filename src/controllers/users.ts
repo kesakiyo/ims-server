@@ -9,11 +9,13 @@ import { LocalStrategyInfo } from 'passport-local';
 /* Internal dependencies */
 import { default as User, UserModel } from '../models/User';
 import passportConfig from '../config/passport';
+import signUpValidator from '../middlewares/validators/signUpValidator';
+import { errorCreator } from '../utils/errorUtils';
 
 const router: Router = express.Router();
 
 /**
- * @api {post} /v1/users Create
+ * @api {post} /v1/users/signup Create
  * @apiGroup User
  * @apiName Create user
  * @apiDescription Create user with email, password, passwordConfirm
@@ -26,29 +28,18 @@ const router: Router = express.Router();
  *        updatedAt: 'number'
  *    }
  */
-router.post('/', (req: Request, res: Response, next: NextFunction): void => {
+router.post('/signup', signUpValidator, (req: Request, res: Response, next: NextFunction): void => {
   const user: Document = new User({
     email: req.body.email,
     password: req.body.password,
   })
 
-  User.findOne({ email: req.body.email }, (err, existingUser): void => {
+  user.save((err, savedUser): void => {
     if (err) {
       return next(err);
     }
-
-    if (existingUser) {
-      res.status(HttpStatus.UNPROCESSABLE_ENTITY).send({ message: "Account with that email address already exists." });
-      return null;
-    }
-
-    user.save((err): void => {
-      if (err) {
-        return next(err);
-      }
-      res.status(HttpStatus.OK).send('ok')
-    })
-  });
+    res.status(HttpStatus.OK).json({ user: savedUser });
+  })
 });
 
 /**
@@ -71,10 +62,25 @@ router.post('/signin', (req: Request, res: Response, next: NextFunction) => {
       return next(err);
     }
 
-    // todo: user를 왜 못찾았는지에 대한 정확한 정보를 전달해 줄 필요가 있음.
     if (!user) {
-      return res.status(HttpStatus.UNPROCESSABLE_ENTITY).send({
-        error: 'Not found user',
+      return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
+        errors: [
+          errorCreator(
+            'email',
+            info.message,
+          )
+        ],
+      });
+    }
+
+    if (info) {
+      return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
+        errors: [
+          errorCreator(
+            'password',
+            info.message,
+          )
+        ],
       });
     }
 
