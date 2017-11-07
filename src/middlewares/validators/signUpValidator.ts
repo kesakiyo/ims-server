@@ -4,6 +4,7 @@ import * as HttpStatus from 'http-status-codes';
 import * as validator from 'validator';
 
 /* Internal dependencies */
+import { default as User, UserModel } from '../../models/User';
 import { Error, errorCreator } from '../../utils/errorUtils';
 import errorMessage from '../../constants/errorMessage';
 
@@ -84,5 +85,21 @@ export default (req: Request, res: Response, next: NextFunction): void => {
     return null;
   }
 
-  return next();
+  /* Start check to exist user */
+  User.findOne({ email }, (err, existingUser): void => {
+    if (err) {
+      return next(err);
+    }
+
+    if (existingUser) {
+      errors.push(errorCreator(
+        'email',
+        errorMessage.EXISTED_EMAIL,
+      ))
+
+      res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({ errors });
+    }
+
+    return next();
+  })
 }

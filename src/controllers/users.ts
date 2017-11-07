@@ -33,23 +33,12 @@ router.post('/signup', signUpValidator, (req: Request, res: Response, next: Next
     password: req.body.password,
   })
 
-  User.findOne({ email: req.body.email }, (err, existingUser): void => {
+  user.save((err, savedUser): void => {
     if (err) {
       return next(err);
     }
-
-    if (existingUser) {
-      res.status(HttpStatus.UNPROCESSABLE_ENTITY).send({ message: "Account with that email address already exists." });
-      return null;
-    }
-
-    user.save((err): void => {
-      if (err) {
-        return next(err);
-      }
-      res.status(HttpStatus.OK).send('ok')
-    })
-  });
+    res.status(HttpStatus.OK).json({ user: savedUser });
+  })
 });
 
 /**

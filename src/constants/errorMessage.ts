@@ -5,5 +5,5 @@ export default {
   PASSWORD_NOT_MATCH: '비밀번호가 일치하지 않습니다.',
   TOO_LONG_PASSWORD: '비밀번호는 최대 20자까지 가능합니다.',
   TOO_LONG_PASSWORD_CONFIRM: '비밀번호 확인은 최대 20자까지 가능합니다.',
-  NOT_EXIST_EMAIL: '존재하지 않는 이메일입니다.',
+  EXISTED_EMAIL: '이미 가입된 이메일입니다.',
 }
