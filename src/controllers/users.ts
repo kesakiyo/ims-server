@@ -9,11 +9,12 @@ import { LocalStrategyInfo } from 'passport-local';
 /* Internal dependencies */
 import { default as User, UserModel } from '../models/User';
 import passportConfig from '../config/passport';
+import signUpValidator from '../middlewares/validators/signUpValidator';
 
 const router: Router = express.Router();
 
 /**
- * @api {post} /v1/users Create
+ * @api {post} /v1/users/signup Create
  * @apiGroup User
  * @apiName Create user
  * @apiDescription Create user with email, password, passwordConfirm
@@ -26,7 +27,7 @@ const router: Router = express.Router();
  *        updatedAt: 'number'
  *    }
  */
-router.post('/', (req: Request, res: Response, next: NextFunction): void => {
+router.post('/signup', signUpValidator, (req: Request, res: Response, next: NextFunction): void => {
   const user: Document = new User({
     email: req.body.email,
     password: req.body.password,
