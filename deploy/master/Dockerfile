@@ -10,4 +10,4 @@ RUN git checkout master && \
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD ["npm", "run", "forever"]
