@@ -5,12 +5,12 @@ import * as validator from 'validator';
 
 /* Internal dependencies */
 import { default as User, UserModel } from '../../models/User';
-import { Error, errorCreator } from '../../utils/errorUtils';
+import { CustomError, errorCreator } from '../../utils/errorUtils';
 import errorMessage from '../../constants/errorMessage';
 
 export default (req: Request, res: Response, next: NextFunction): void => {
   const { email = '', password = '', passwordConfirm = '' } = req.body;
-  const errors: Error[] = [];
+  const errors: CustomError[] = [];
 
   /* Start email validation */
 
@@ -98,6 +98,7 @@ export default (req: Request, res: Response, next: NextFunction): void => {
       ))
 
       res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({ errors });
+      return null;
     }
 
     return next();

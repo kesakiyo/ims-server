@@ -6,6 +6,7 @@ import * as HttpStatus from 'http-status-codes';
 
 /* Internal dependnecies */
 import User from '../models/User';
+import errorMessage from '../constants/errorMessage';
 
 const initizliaer = (passport: passport.Passport) => {
   const LocalStrategy = passportLocal.Strategy;
@@ -26,11 +27,11 @@ const initizliaer = (passport: passport.Passport) => {
   passport.use('local', new LocalStrategy({  usernameField: 'email', passwordField: 'password' }, (email, password, done) => {
     User.findOne({ email: email.toLowerCase() }, (err, user: any) => {
       if (err) { 
-        return done(err); 
+        return done(err);
       }
 
       if (!user) {
-        return done(undefined, false, { message: `Email ${email} not found.` });
+        return done(undefined, false, { message: errorMessage.NOT_EXISTED_EMAIL });
       }
 
       user.comparePassword(password, (err: Error, isMatch: boolean) => {
@@ -42,7 +43,7 @@ const initizliaer = (passport: passport.Passport) => {
           return done(undefined, user);
         }
 
-        return done(undefined, false, { message: "Invalid email or password." });
+        return done(undefined, user, { message: errorMessage.PASSWORD_NOT_MATCH });
       });
     });
   }))

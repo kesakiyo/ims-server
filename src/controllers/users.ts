@@ -10,6 +10,7 @@ import { LocalStrategyInfo } from 'passport-local';
 import { default as User, UserModel } from '../models/User';
 import passportConfig from '../config/passport';
 import signUpValidator from '../middlewares/validators/signUpValidator';
+import { errorCreator } from '../utils/errorUtils';
 
 const router: Router = express.Router();
 
@@ -61,10 +62,25 @@ router.post('/signin', (req: Request, res: Response, next: NextFunction) => {
       return next(err);
     }
 
-    // todo: user를 왜 못찾았는지에 대한 정확한 정보를 전달해 줄 필요가 있음.
     if (!user) {
-      return res.status(HttpStatus.UNPROCESSABLE_ENTITY).send({
-        error: 'Not found user',
+      return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
+        errors: [
+          errorCreator(
+            'email',
+            info.message,
+          )
+        ],
+      });
+    }
+
+    if (info) {
+      return res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
+        errors: [
+          errorCreator(
+            'password',
+            info.message,
+          )
+        ],
       });
     }
 

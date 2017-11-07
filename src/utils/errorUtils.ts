@@ -1,6 +1,6 @@
-export interface Error {
+export interface CustomError {
   field: string,
   message: string,
 }
 
-export const errorCreator = (field: string, message: string): Error => ({ field, message })
+export const errorCreator = (field: string, message: string): CustomError => ({ field, message })
