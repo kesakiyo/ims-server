@@ -7,6 +7,7 @@ import * as connectMongo from 'connect-mongo';
 import * as compression from 'compression';
 import * as session from 'express-session';
 import * as passport from 'passport';
+import * as cors from 'cors';
 
 /* Internal dependencies */
 import test from './controllers/test';
@@ -49,6 +50,7 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(cors());
 
 passportConfig.initizliaer(passport);
 
@@ -61,7 +63,7 @@ app.use('/v1', ((): Router => {
   router.use('/sessions', sessions);
   router.use('/interviews', interviews);
   router.use('/questions', questions);
-  
+
   return router;
 })());
 
