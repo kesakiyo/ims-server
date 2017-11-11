@@ -124,7 +124,7 @@ router.delete('/signout', (req: Request, res: Response, next: NextFunction) => {
  *    }
  */
 router.get('/me', passportConfig.isAuthenticated, (req: Request, res: Response): void => {
-  res.status(HttpStatus.OK).json(req.user.toJSON());
+  res.status(HttpStatus.OK).json({ user: req.user.toJSON() });
 });
 
 export default router;
