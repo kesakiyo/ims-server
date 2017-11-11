@@ -89,7 +89,7 @@ router.post('/signin', (req: Request, res: Response, next: NextFunction) => {
         return next(err);
       }
 
-      res.status(200).json(user);
+      res.status(200).json({ user });
     })
   })(req, res, next);
 });
