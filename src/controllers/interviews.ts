@@ -12,6 +12,8 @@ import { default as Question, QuestionModel } from '../models/Question';
 import { default as Session, SessionModel } from '../models/Session';
 import { default as User } from '../models/User';
 import sessionRole from '../constants/sessionRole';
+import { CustomError, errorCreator } from '../utils/errorUtils';
+import errorMessage from '../constants/errorMessage';
 
 const router: Router = express.Router();
 
@@ -131,6 +133,92 @@ router.post('/', passportConfig.isAuthenticated, (req: Request, res: Response, n
 });
 
 /**
+ * @api {put} /v1/interviews/:id/join join to the interview
+ * @apiGroup Interview
+ * @apiName join interview
+ * @apiDescription join to the interview
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *    {
+ *        interview: {
+ *          id: number,
+ *            title: string,
+ *            description: string,
+ *            startTime: number,
+ *            endTime: number,
+ *            createdAt: number,
+ *            updatedAt: number,
+ *        },
+ *        session: {
+ *            id: 'number',
+ *            role: 'string',
+ *            userId: 'User',
+ *            interview: 'Interview',
+ *            createdAt: 'number',
+ *            updatedAt: 'number'
+ *        }
+ *    }
+ */
+router.put('/:id/join', passportConfig.isAuthenticated, (req: Request, res: Response, next: NextFunction): void => {
+  Interview.findOne({ id: req.params.id }, (err, interview: InterviewModel): void => {
+    if (err) {
+      return next(err);
+    }
+
+    if (!interview) {
+      res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({ errors: [
+        errorCreator(
+          'id',
+          errorMessage.NOT_EXISTED_INTERVIEW,
+        )
+      ]});
+      return null;
+    }
+
+    Session.findOne({ interviewId: interview.id, userId: req.user.id }, (err, session: SessionModel): void => {
+      if (err) {
+        return next(err);
+      }
+
+      if (session) {
+        if (!session.isInterviewee()) {
+          res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({ errors: [
+            errorCreator(
+              'role',
+              errorMessage.NOT_ALLOWED_JOIN_TO_INTERVIEW,
+            )
+          ]});
+          return null;
+        }
+
+        res.status(HttpStatus.OK).json({ interview, session });
+        return null;
+      }
+
+      const newSession: Document = new Session({
+        email: req.user.email,
+        role: sessionRole.INTERVIEWEE,
+        interviewId: interview.id,
+        userId: req.user.id,
+      });
+
+      newSession.save((err: Error, savedSession: SessionModel): void => {
+        if (err) {
+          return next(err);
+        }
+
+        res.status(HttpStatus.OK).json({
+          interview,
+          session: savedSession,
+        });
+
+        return null;
+      })
+    })
+  })
+})
+
+/**
  * @api {get} /v1/interviews/:id/sessions get sessions of interview
  * @apiGroup Interview
  * @apiName get sessions of interview
@@ -173,7 +261,7 @@ router.get('/:id/sessions', passportConfig.isAuthenticated, (req: Request, res: 
  * @api {post} /v1/interviews/:id/sessions session create of interivew
  * @apiGroup Interview
  * @apiName join interview
- * @apiDescription Interviewee joins to the interview 
+ * @apiDescription Interviewee joins to the interview
  *
  * @apiSuccessExample {json} Success-Response:
  *    {
@@ -208,7 +296,7 @@ router.post('/:id/sessions', passportConfig.isAuthenticated, (req: Request, res:
       mobileNumber: req.body.mobileNumber,
       role: req.body.role,
     });
-    
+
     session.save((err: Error, savedSession: QuestionModel): void => {
       if (err) {
         return next(err);
