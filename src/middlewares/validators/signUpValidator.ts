@@ -22,7 +22,7 @@ export default (req: Request, res: Response, next: NextFunction): void => {
       ))
       return null;
     }
-  
+
     if (!validator.isEmail(email)) {
       errors.push(errorCreator(
         'email',
@@ -45,7 +45,7 @@ export default (req: Request, res: Response, next: NextFunction): void => {
       ))
       return null;
     }
-  
+
     if (!validator.isLength(password, { min: 1, max: 20 })) {
       errors.push(errorCreator(
         'password',
@@ -68,11 +68,19 @@ export default (req: Request, res: Response, next: NextFunction): void => {
       ))
       return null;
     }
-  
+
     if (!validator.isLength(password, { min: 1, max: 20 })) {
       errors.push(errorCreator(
         'passwordConfirm',
         errorMessage.TOO_LONG_PASSWORD_CONFIRM,
+      ))
+      return null;
+    }
+
+    if (password !== passwordConfirm) {
+      errors.push(errorCreator(
+        'passwordConfirm',
+        errorMessage.PASSWORD_CONFIRM_NOT_MATCH,
       ))
       return null;
     }
