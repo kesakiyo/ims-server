@@ -7,4 +7,6 @@ export default {
   TOO_LONG_PASSWORD_CONFIRM: '비밀번호 확인은 최대 20자까지 가능합니다.',
   EXISTED_EMAIL: '이미 가입된 이메일입니다.',
   NOT_EXISTED_EMAIL: '존재하지 않는 이메일입니다.',
+  NOT_EXISTED_INTERVIEW: '존재하지 않는 인터뷰입니다.',
+  NOT_ALLOWED_JOIN_TO_INTERVIEW: '인터뷰어나 마스터는 인터뷰이로 참가할 수 없습니다.',
 }
