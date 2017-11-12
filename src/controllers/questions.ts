@@ -9,16 +9,29 @@ import passportConfig from '../config/passport';
 import { default as Question, QuestionModel } from '../models/Question';
 import { default as Session, SessionModel } from '../models/Session';
 import { default as Answer, AnswerModel } from '../models/Answer';
+import { CustomError, errorCreator } from '../utils/errorUtils';
+import errorMessage from '../constants/errorMessage';
 
 const router: Router = express.Router();
 
 /**
- * @api {get} /v1/test/ping Ping
- * @apiGroup Test
- * @apiName Ping
+ * @api {post} /v1/questions/:id/answers create answer of question
+ * @apiGroup Question
+ * @apiName Create answer
+ * @apiDescription create answer of question
  *
- * @apiSuccessExample {String} Success-Response:
- *    pong
+ * @apiSuccessExample {json} Success-Response:
+ *    {
+ *        answer: {
+ *            id: number,
+ *            text: string,
+ *            file: string,
+ *            userId: number,
+ *            questionId: number,
+ *            createdAt: number,
+ *            updatedAt: number,
+ *        }
+ *    }
  */
 router.post('/:id/answers', passportConfig.isAuthenticated, (req: Request, res: Response, next: NextFunction): void => {
   Question.findOne({ id: req.params.id }, (err, qusetion: QuestionModel): void => {
@@ -27,50 +40,63 @@ router.post('/:id/answers', passportConfig.isAuthenticated, (req: Request, res: 
     }
 
     if (!qusetion) {
-      res.status(HttpStatus.UNPROCESSABLE_ENTITY).send('존재하지 않는 qusetion 아이디 입니다.');
+      res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
+        error: errorCreator(
+          'questionId',
+          errorMessage.NOT_EXISTED_QUESTION,
+        )
+      });
       return null;
     }
-    
+
     Session.findOne({ userId: req.user.id, interviewId: qusetion.interviewId }, (err, session: SessionModel): void => {
       if (err) {
         return next(err);
       }
 
       if (!session || !session.isInterviewee()) {
-        res.status(HttpStatus.UNAUTHORIZED).send('interviewee만 답변을 저장할 수 있습니다.');
+        res.status(HttpStatus.UNAUTHORIZED).json({
+          error: errorCreator(
+            'role',
+            errorMessage.NOT_ALLOWED_CREATE_ANSWER
+          )
+        });
         return null;
       }
 
       // toto: Question Type에 따라 S3에 저장하는 로직 추가
-      const answer: Document = new Answer({
-        userId: req.user.id,
-        questionId: qusetion.id,
-        text: req.body.text,
-      })
+      if (qusetion.isTextType()) {
 
-      Answer.findOneAndUpdate({
-        userId: req.user.id,
-        questionId: qusetion.id,
-      }, {
-        userId: req.user.id,
-        questionId: qusetion.id,
-        text: req.body.text,
-      }, {
-        upsert: true,
-        new: true,
-      }, (err, answer: AnswerModel) => {
-        if (err) {
-          return next(err);
-        }
+        Answer.findOne({ userId: req.user.id, questionId: qusetion.id }, (err, answer: AnswerModel): void => {
+          if (err) {
+            return next(err);
+          }
 
-        if (!answer) {
-          res.status(HttpStatus.UNPROCESSABLE_ENTITY).send('답변 저장에 실패했습니다.');
-          return null;
-        }
+          const newAnswer: Document = (() => {
+            if (answer) {
+              answer.text = req.body.text;
+              return answer;
+            }
+            return new Answer({
+              userId: req.user.id,
+              questionId: qusetion.id,
+              text: req.body.text,
+            })
+          })();
 
-        res.status(HttpStatus.OK).json(answer);
-      })
-    })
+          newAnswer.save((err, savedAnswer: AnswerModel): void => {
+            if (err) {
+              return next(err);
+            }
+
+            res.status(HttpStatus.OK).json({ answer: savedAnswer });
+            return null;
+          });
+        });
+      } else if (qusetion.isFileType()) {
+        res.status(HttpStatus.UNPROCESSABLE_ENTITY).send('아직 준비가 안됐어요....ㅜㅜ');
+      }
+    });
   })
 });
 

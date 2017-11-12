@@ -6,6 +6,7 @@ import { Schema, Model, Document } from 'mongoose';
 import setTimestamps from './plugins/setTimestamps';
 import setAutoIncId from './plugins/setAutoIncId';
 import hideField from './plugins/hideField';
+import questionType from '../constants/questionType';
 
 export type QuestionModel = mongoose.Document & {
   _id: string,
@@ -17,6 +18,9 @@ export type QuestionModel = mongoose.Document & {
   interviewId: number,
   createdAt: number,
   updatedAt: number,
+
+  isFileType: () => boolean,
+  isTextType: () => boolean,
 };
 
 const QuestionSchema: Schema = new mongoose.Schema({
@@ -48,6 +52,14 @@ const QuestionSchema: Schema = new mongoose.Schema({
 QuestionSchema.plugin(setTimestamps);
 QuestionSchema.plugin(setAutoIncId, { schemaName: 'QuestionId' });
 QuestionSchema.plugin(hideField);
+
+QuestionSchema.methods.isFileType = function() {
+  return this.type === questionType.FILE;
+}
+
+QuestionSchema.methods.isTextType = function() {
+  return this.type === questionType.TEXT;
+}
 
 const Question: Model<Document> = mongoose.model('Question', QuestionSchema);
 
