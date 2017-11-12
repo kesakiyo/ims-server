@@ -165,7 +165,6 @@ router.post('/:id/answers/:answerId/files', passportConfig.isAuthenticated, mult
       if (req.files) {
         fileUploader(req.files, req.user)
           .then((data: FileInterface) => {
-            console.log(data);
             answer.file = data;
             answer.save((err, savedAnswer: AnswerModel) => {
               if (err) {
