@@ -12,4 +12,10 @@ export default {
   NOT_EXISTED_SESSION: '존재하지 않는 세션입니다.',
   NOT_ALLOWED_UPDATE_SESSION: '세션을 수정할 권한이 없습니다.',
   NOT_MOBILE_NUMBER: '올바른 전화번호가 아닙니다.',
+  TOO_LONG_QUESTION_TITLE: '질문의 길이는 최대 100자까지 가능합니다.',
+  TOO_LONG_QUESTION_DESCRIPTION: '질문의 설명은 최대 500자까지 가능합니다.',
+  NOT_ALLOWED_QUESTION_TYPE: '질문의 타입은 file, text만 가능합니다.',
+  NOT_EXISTED_QUESTION_LIMIT: '타입이 text일 때 답변의 최대 길이는 꼭 있어야 합니다.',
+  TOO_LONG_QUESTION_LIMIT: '답변의 최대 길이는 10000자까지 가능합니다.',
+  NOT_ALLOWED_UPSERT_QUESTION: '권한이 없습니다. 마스터 권한만 작업이 가능합니다',
 }

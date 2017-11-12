@@ -13,6 +13,7 @@ export type QuestionModel = mongoose.Document & {
   title: string,
   description: string,
   type: string,
+  limit: number,
   interviewId: number,
   createdAt: number,
   updatedAt: number,
@@ -22,11 +23,20 @@ const QuestionSchema: Schema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
+    maxlength: 100,
   },
-  description: String,
+  description: {
+    type: String,
+    default: '',
+    maxlength: 500,
+  },
   type: {
     type: String,
     required: true,
+  },
+  limit: {
+    type: Number,
+    max: 10000,
   },
   interviewId: {
     type: Number,
