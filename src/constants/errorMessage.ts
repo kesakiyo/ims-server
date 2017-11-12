@@ -18,4 +18,5 @@ export default {
   NOT_EXISTED_QUESTION_LIMIT: '타입이 text일 때 답변의 최대 길이는 꼭 있어야 합니다.',
   TOO_LONG_QUESTION_LIMIT: '답변의 최대 길이는 10000자까지 가능합니다.',
   NOT_ALLOWED_UPSERT_QUESTION: '권한이 없습니다. 마스터 권한만 작업이 가능합니다',
+  NOT_ALLOWED_GET_QUESTIONS: '질문 목록을 불러올 권한이 없습니다.',
 }
