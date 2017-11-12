@@ -10,6 +10,7 @@ import passportConfig from '../config/passport';
 import { default as Interview, InterviewModel } from '../models/Interview';
 import { default as Question, QuestionModel } from '../models/Question';
 import { default as Session, SessionModel } from '../models/Session';
+import { default as Answer, AnswerModel } from '../models/Answer';
 import { default as User } from '../models/User';
 import sessionRole from '../constants/sessionRole';
 import { CustomError, errorCreator } from '../utils/errorUtils';
@@ -341,6 +342,16 @@ router.post('/:id/questions', passportConfig.isAuthenticated, questionValidator,
  *            interviewId: 'number',
  *            createdAt: 'number',
  *            updatedAt: 'number'
+ *        }],
+ *        answers: [{
+ *            id: number,
+ *            text: string,
+ *            file: string,
+ *            userId: number,
+ *            questionId: number,
+ *            interviewId: number,
+ *            createdAt: number,
+ *            updatedAt: number,
  *        }]
  *    }
  */
@@ -368,7 +379,15 @@ router.get('/:id/questions', passportConfig.isAuthenticated, (req: Request, res:
           return next(err);
         }
 
-        res.status(HttpStatus.OK).json({ questions });
+        Answer
+          .find({ userId: req.user.id, interviewId: req.params.id })
+          .exec((err, answers: AnswerModel[]): void => {
+            if (err) {
+              return next(err);
+            }
+
+            res.status(HttpStatus.OK).json({ questions, answers });
+          })
       })
   })
 });

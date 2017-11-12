@@ -67,6 +67,16 @@ router.post('/:id/answers', passportConfig.isAuthenticated, (req: Request, res: 
       // toto: Question Type에 따라 S3에 저장하는 로직 추가
       if (qusetion.isTextType()) {
 
+        if ((req.body.text || '').length > qusetion.limit) {
+          res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
+            error: errorCreator(
+              'length',
+              errorMessage.TOO_LONG_ANSWER_LENGTH
+            )
+          });
+          return null;
+        }
+
         Answer.findOne({ userId: req.user.id, questionId: qusetion.id }, (err, answer: AnswerModel): void => {
           if (err) {
             return next(err);
@@ -80,6 +90,7 @@ router.post('/:id/answers', passportConfig.isAuthenticated, (req: Request, res: 
             return new Answer({
               userId: req.user.id,
               questionId: qusetion.id,
+              interviewId: qusetion.interviewId,
               text: req.body.text,
             })
           })();

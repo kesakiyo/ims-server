@@ -20,5 +20,6 @@ export default {
   NOT_ALLOWED_UPSERT_QUESTION: '권한이 없습니다. 마스터 권한만 작업이 가능합니다',
   NOT_ALLOWED_GET_QUESTIONS: '질문 목록을 불러올 권한이 없습니다.',
   NOT_EXISTED_QUESTION: '존재하지 않는 질문입니다.',
-  NOT_ALLOWED_CREATE_ANSWER: 'interviewee만 답변을 저장할 수 있습니다.'
+  NOT_ALLOWED_CREATE_ANSWER: 'interviewee만 답변을 저장할 수 있습니다.',
+  TOO_LONG_ANSWER_LENGTH: '답변의 길이가 질문의 제한보다 깁니다.',
 }

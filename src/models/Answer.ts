@@ -14,6 +14,7 @@ export type AnswerModel = mongoose.Document & {
   file: string,
   userId: number,
   questionId: number,
+  interviewId: number,
   createdAt: number,
   updatedAt: number,
 };
@@ -31,6 +32,11 @@ const AnswerSchema: Schema = new mongoose.Schema({
     required: true,
     ref: 'Question',
   },
+  interviewId: {
+    type: Number,
+    required: true,
+    ref: 'Interview',
+  }
 });
 
 AnswerSchema.index({
@@ -40,6 +46,12 @@ AnswerSchema.index({
   unique: true,
 })
 
+AnswerSchema.index({
+  userId: 1,
+  interviewId: 1,
+}, {
+  unique: true,
+})
 
 AnswerSchema.plugin(setTimestamps);
 AnswerSchema.plugin(setAutoIncId, { schemaName: 'AnswerId' });
