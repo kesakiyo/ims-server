@@ -14,6 +14,7 @@ import { default as User } from '../models/User';
 import sessionRole from '../constants/sessionRole';
 import { CustomError, errorCreator } from '../utils/errorUtils';
 import errorMessage from '../constants/errorMessage';
+import questionValidator from '../middlewares/validators/questionValidator';
 
 const router: Router = express.Router();
 
@@ -274,28 +275,39 @@ router.get('/:id/sessions', passportConfig.isAuthenticated, (req: Request, res: 
  *        updatedAt: 'number'
  *    }
  */
-router.post('/:id/questions', passportConfig.isAuthenticated, (req: Request, res: Response, next: NextFunction): void => {
+router.post('/:id/questions', passportConfig.isAuthenticated, questionValidator, (req: Request, res: Response, next: NextFunction): void => {
   Session.findOne({ userId: req.user.id, interviewId: req.params.id }, (err, session: SessionModel): void => {
     if (err) {
       return next(err);
     }
 
     if (!session) {
-      res.status(HttpStatus.UNPROCESSABLE_ENTITY).send('세션을 찾을 수 없습니다.')
+      res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
+        error: errorCreator(
+          'sessionId',
+          errorMessage.NOT_EXISTED_SESSION
+        )
+      })
       return null;
     }
 
     if (!session.isMaster()) {
-      res.status(HttpStatus.UNAUTHORIZED).send('권한이 없습니다. 마스터만 질문을 추가할 수 있습니다.');
+      res.status(HttpStatus.UNAUTHORIZED).json({
+        error: errorCreator(
+          'role',
+          errorMessage.NOT_ALLOWED_UPSERT_QUESTION
+        )
+      })
       return null;
     }
 
-    const { title, description, type, order } = req.body
+    const { title, description, type, limit } = req.body
 
     const question: Document = new Question({
       title,
       description,
       type,
+      limit,
       interviewId: session.interviewId,
     })
 
@@ -304,7 +316,7 @@ router.post('/:id/questions', passportConfig.isAuthenticated, (req: Request, res
         return next(err);
       }
 
-      res.status(HttpStatus.OK).json(savedQuestion);
+      res.status(HttpStatus.OK).json({ question: savedQuestion });
     })
   })
 })
