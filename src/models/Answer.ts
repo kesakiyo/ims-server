@@ -7,11 +7,18 @@ import setTimestamps from './plugins/setTimestamps';
 import setAutoIncId from './plugins/setAutoIncId';
 import hideField from './plugins/hideField';
 
+export interface FileInterface {
+  name: string,
+  url: string,
+  size: number,
+  mimeType: string,
+}
+
 export type AnswerModel = mongoose.Document & {
   _id: string,
   id: number,
   text: string,
-  file: string,
+  file: FileInterface,
   userId: number,
   questionId: number,
   interviewId: number,
@@ -21,7 +28,7 @@ export type AnswerModel = mongoose.Document & {
 
 const AnswerSchema: Schema = new mongoose.Schema({
   text: String,
-  file: String,
+  file: Object,
   userId: {
     type: Number,
     required: true,

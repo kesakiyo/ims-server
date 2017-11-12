@@ -22,4 +22,7 @@ export default {
   NOT_EXISTED_QUESTION: '존재하지 않는 질문입니다.',
   NOT_ALLOWED_CREATE_ANSWER: 'interviewee만 답변을 저장할 수 있습니다.',
   TOO_LONG_ANSWER_LENGTH: '답변의 길이가 질문의 제한보다 깁니다.',
+  NOT_ALLOWED_FILE: '파일을 올릴 수 있는 질문이 아닙니다.',
+  NOT_EXISTED_ANSWER: '존재하지 않는 답변입니다.',
+  NOT_ALLOSWD_CREATE_FILE: '파일을 올릴 수 있는 사용자가 아닙니다.',
 }
