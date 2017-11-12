@@ -266,13 +266,16 @@ router.get('/:id/sessions', passportConfig.isAuthenticated, (req: Request, res: 
  *
  * @apiSuccessExample {json} Success-Response:
  *    {
- *        id: 'number',
- *        title: 'string',
- *        description: 'string',
- *        type: 'string',
- *        interviewId: 'number',
- *        createdAt: 'number',
- *        updatedAt: 'number'
+ *        question: {
+ *            id: 'number',
+ *            title: 'string',
+ *            description: 'string',
+ *            type: 'string',
+ *            limit: 'number',
+ *            interviewId: 'number',
+ *            createdAt: 'number',
+ *            updatedAt: 'number'
+ *        }
  *    }
  */
 router.post('/:id/questions', passportConfig.isAuthenticated, questionValidator, (req: Request, res: Response, next: NextFunction): void => {
@@ -320,5 +323,54 @@ router.post('/:id/questions', passportConfig.isAuthenticated, questionValidator,
     })
   })
 })
+
+/**
+ * @api {get} /v1/interviews/:id/questions get questions of interview
+ * @apiGroup Interview
+ * @apiName get questions
+ * @apiDescription get questions of interview
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *    {
+ *        questions: [{
+ *            id: 'number',
+ *            title: 'string',
+ *            description: 'string',
+ *            type: 'string',
+ *            limit: 'number',
+ *            interviewId: 'number',
+ *            createdAt: 'number',
+ *            updatedAt: 'number'
+ *        }]
+ *    }
+ */
+router.get('/:id/questions', passportConfig.isAuthenticated, (req: Request, res: Response, next: NextFunction): void => {
+  Session.findOne({ interviewId: req.params.id, userId: req.user.id }, (err, session: SessionModel): void => {
+    if (err) {
+      return next(err);
+    }
+
+    if (!session) {
+      res.status(HttpStatus.UNAUTHORIZED).json({
+        error: errorCreator(
+          'role',
+          errorMessage.NOT_ALLOWED_GET_QUESTIONS
+        )
+      })
+      return null;
+    }
+
+    Question
+      .find({ interviewId: req.params.id })
+      .sort({ createdAt: 1 })
+      .exec((err, questions: QuestionModel[]): void => {
+        if (err) {
+          return next(err);
+        }
+
+        res.status(HttpStatus.OK).json({ questions });
+      })
+  })
+});
 
 export default router;
