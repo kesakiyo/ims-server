@@ -15,6 +15,7 @@ import users from './controllers/users';
 import sessions from './controllers/sessions';
 import interviews from './controllers/interviews';
 import questions from './controllers/questions';
+import answers from './controllers/answers';
 import secret from './config/secret';
 
 /* API keys and Passport configuration. */
@@ -37,8 +38,8 @@ const MongoStore = connectMongo(session);
 
 /* Apply Middleware */
 app.use(compression());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
+app.use(bodyParser.json({limit: '50mb'}));
 app.use(session({
   store: new MongoStore({
     mongooseConnection: mongoose.connection,
@@ -66,6 +67,7 @@ app.use('/v1', ((): Router => {
   router.use('/sessions', sessions);
   router.use('/interviews', interviews);
   router.use('/questions', questions);
+  router.use('/answers', answers);
 
   return router;
 })());
