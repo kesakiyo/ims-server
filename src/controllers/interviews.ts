@@ -166,12 +166,12 @@ router.put('/:id/join', passportConfig.isAuthenticated, (req: Request, res: Resp
     }
 
     if (!interview) {
-      res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({ errors: [
-        errorCreator(
+      res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
+        error: errorCreator(
           'id',
           errorMessage.NOT_EXISTED_INTERVIEW,
         )
-      ]});
+      });
       return null;
     }
 
@@ -182,12 +182,12 @@ router.put('/:id/join', passportConfig.isAuthenticated, (req: Request, res: Resp
 
       if (session) {
         if (!session.isInterviewee()) {
-          res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({ errors: [
-            errorCreator(
+          res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
+            error: errorCreator(
               'role',
               errorMessage.NOT_ALLOWED_JOIN_TO_INTERVIEW,
             )
-          ]});
+          });
           return null;
         }
 
@@ -254,56 +254,6 @@ router.get('/:id/sessions', passportConfig.isAuthenticated, (req: Request, res: 
 
         res.status(HttpStatus.OK).json({ sessions })
       });
-  });
-})
-
-/**
- * @api {post} /v1/interviews/:id/sessions session create of interivew
- * @apiGroup Interview
- * @apiName join interview
- * @apiDescription Interviewee joins to the interview
- *
- * @apiSuccessExample {json} Success-Response:
- *    {
- *        id: 'number',
- *        role: 'string',
- *        userId: 'User',
- *        interview: 'Interview',
- *        createdAt: 'number',
- *        updatedAt: 'number'
- *    }
- */
-router.post('/:id/sessions', passportConfig.isAuthenticated, (req: Request, res: Response, next: NextFunction): void => {
-  if (req.body.role !== sessionRole.INTERVIEWEE) {
-    res.status(HttpStatus.UNPROCESSABLE_ENTITY).send(`role 은 항상 ${sessionRole.INTERVIEWEE} 이어야 합니다.`)
-    return null;
-  }
-
-  Session.findOne({ userId: req.user.id, interviewId: req.params.id }, (err, existedSession: SessionModel): void => {
-    if (err) {
-      return next(err);
-    }
-
-    if (existedSession) {
-      res.status(HttpStatus.UNPROCESSABLE_ENTITY).send('이미 참가한 인터뷰입니다.')
-      return null;
-    }
-
-    const session: Document = new Session({
-      userId: req.user.id,
-      interviewId: req.params.id,
-      email: req.body.email,
-      mobileNumber: req.body.mobileNumber,
-      role: req.body.role,
-    });
-
-    session.save((err: Error, savedSession: QuestionModel): void => {
-      if (err) {
-        return next(err);
-      }
-
-      res.status(HttpStatus.OK).json(savedSession);
-    });
   });
 })
 
