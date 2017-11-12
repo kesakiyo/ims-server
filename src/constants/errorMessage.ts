@@ -9,4 +9,7 @@ export default {
   NOT_EXISTED_EMAIL: '존재하지 않는 이메일입니다.',
   NOT_EXISTED_INTERVIEW: '존재하지 않는 인터뷰입니다.',
   NOT_ALLOWED_JOIN_TO_INTERVIEW: '인터뷰어나 마스터는 인터뷰이로 참가할 수 없습니다.',
+  NOT_EXISTED_SESSION: '존재하지 않는 세션입니다.',
+  NOT_ALLOWED_UPDATE_SESSION: '세션을 수정할 권한이 없습니다.',
+  NOT_MOBILE_NUMBER: '올바른 전화번호가 아닙니다.',
 }

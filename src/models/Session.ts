@@ -34,6 +34,7 @@ const SessionSchema: Schema = new mongoose.Schema({
   },
   mobileNumber: {
     type: String,
+    default: '',
   },
   interviewId: {
     type: Number,
