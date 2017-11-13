@@ -53,7 +53,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(cors({
   credentials: true,
-  origin: ['http://localhost:4000', 'http://nextview.co'],
+  origin: true,
 }));
 
 passportConfig.initizliaer(passport);
