@@ -116,9 +116,10 @@ router.post('/', passportConfig.isAuthenticated, (req: Request, res: Response, n
     }
 
     const session: Document = new Session({
-      userId: req.user.id,
       role: sessionRole.MASTER,
+      email: req.user.email,
       interviewId: savedInterview.id,
+      userId: req.user.id,
     })
 
     session.save((err: Error, savedSession: SessionModel): void => {
