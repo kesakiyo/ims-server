@@ -52,8 +52,10 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cors({
+  origin: function(origin, callback) {
+    callback(null, true);
+  },
   credentials: true,
-  origin: true,
 }));
 
 passportConfig.initizliaer(passport);
