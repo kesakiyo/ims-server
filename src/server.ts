@@ -52,7 +52,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cors({
-  origin: 'http://nextview.co',
+  origin: true,
   credentials: true,
 }));
 
