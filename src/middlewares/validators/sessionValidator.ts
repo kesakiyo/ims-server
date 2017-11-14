@@ -37,7 +37,7 @@ export default (req: Request, res: Response, next: NextFunction): void => {
   /* Start Session validation */
 
   ((): void => {
-    if (name && name.length > 20) {
+    if (name && (name as string).length > 20) {
       errors.push(errorCreator(
         'name',
         errorMessage.TOO_LONG_SESSION_NAME
