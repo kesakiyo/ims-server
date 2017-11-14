@@ -94,6 +94,7 @@ router.put('/:id', passportConfig.isAuthenticated, sessionValidator, (req: Reque
     }
 
     session.email = req.body.email;
+    session.name = req.body.name;
     session.mobileNumber = req.body.mobileNumber;
 
     session.save((err, savedSession: SessionModel) => {

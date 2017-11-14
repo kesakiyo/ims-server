@@ -9,7 +9,7 @@ import { CustomError, errorCreator } from '../../utils/errorUtils';
 import errorMessage from '../../constants/errorMessage';
 
 export default (req: Request, res: Response, next: NextFunction): void => {
-  const { email = '', mobileNumber = '' } = req.body;
+  const { email = '', name = '', mobileNumber = '' } = req.body;
   const errors: CustomError[] = [];
 
   /* Start email validation */
@@ -19,7 +19,7 @@ export default (req: Request, res: Response, next: NextFunction): void => {
       errors.push(errorCreator(
         'email',
         errorMessage.NONE_EMPTY,
-      ))
+      ));
       return null;
     }
 
@@ -27,12 +27,26 @@ export default (req: Request, res: Response, next: NextFunction): void => {
       errors.push(errorCreator(
         'email',
         errorMessage.INVALID_EMAIL,
-      ))
+      ));
       return null;
     }
   })();
 
   /* End email validation */
+
+  /* Start Session validation */
+
+  ((): void => {
+    if (name && name.length > 20) {
+      errors.push(errorCreator(
+        'name',
+        errorMessage.TOO_LONG_SESSION_NAME
+      ));
+      return null;
+    }
+  })();
+
+  /* End Session validation */
 
 
   /* Start Mobile Number validation */
@@ -42,7 +56,7 @@ export default (req: Request, res: Response, next: NextFunction): void => {
       errors.push(errorCreator(
         'mobileNumber',
         errorMessage.NOT_MOBILE_NUMBER,
-      ))
+      ));
       return null;
     }
   })();

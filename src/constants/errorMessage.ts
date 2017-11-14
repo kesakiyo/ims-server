@@ -25,4 +25,5 @@ export default {
   NOT_ALLOWED_FILE: '파일을 올릴 수 있는 질문이 아닙니다.',
   NOT_EXISTED_ANSWER: '존재하지 않는 답변입니다.',
   NOT_ALLOSWD_CREATE_FILE: '파일을 올릴 수 있는 사용자가 아닙니다.',
+  TOO_LONG_SESSION_NAME: '이름은 최대 20자까지 가능합니다.',
 }
