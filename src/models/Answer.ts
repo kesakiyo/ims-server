@@ -56,8 +56,6 @@ AnswerSchema.index({
 AnswerSchema.index({
   userId: 1,
   interviewId: 1,
-}, {
-  unique: true,
 })
 
 AnswerSchema.plugin(setTimestamps);
