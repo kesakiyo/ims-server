@@ -8,6 +8,6 @@ RUN git checkout master && \
     git pull && \
     npm install
 
-EXPOSE 8000
+EXPOSE 3000
 
 CMD ["npm", "run", "forever"]

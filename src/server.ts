@@ -51,6 +51,10 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(cors({
+  origin: true,
+  credentials: true,
+}));
 
 passportConfig.initizliaer(passport);
 
@@ -69,6 +73,6 @@ app.use('/v1', ((): Router => {
 })());
 
 /* Start app */
-app.listen(8000, (): void => {
-  console.log('ims-server app listening on port 8000');
+app.listen(3000, (): void => {
+  console.log('ims-server app listening on port 3000');
 });
