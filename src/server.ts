@@ -23,8 +23,17 @@ import passportConfig from './config/passport';
 
 process.env.TZ = 'Asia/Seoul';
 
+const MONGO_URL = (() => {
+  if (process.env.NODE_ENV === 'development') {
+    return secret.MONGO_DEV_URL;
+  }
+  return secret.MONGO_URL;
+})();
+
+console.log(`express server is running on the ${process.env.NODE_ENV}`);
+
 /* Connect to mongodb */
-mongoose.connect(secret.MONGO_URL, { useMongoClient: true, promiseLibrary: global.Promise }, (err): void => {
+mongoose.connect(MONGO_URL, { useMongoClient: true, promiseLibrary: global.Promise }, (err): void => {
   if (err) {
     console.log('Occurred the error when connecting mongodb: ', err);
   }
