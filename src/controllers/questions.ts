@@ -1,4 +1,5 @@
 /* External dependencies */
+import * as _ from 'lodash';
 import * as express from 'express';
 import { Document } from 'mongoose';
 import { Router, Request, Response, NextFunction } from 'express';
@@ -81,6 +82,38 @@ router.post('/:id/answers', passportConfig.isAuthenticated, (req: Request, res: 
         return null;
       }
 
+      if (qusetion.isCheckBoxType() || qusetion.isRadioType()) {
+        if (!_.isArray(req.body.values)) {
+          res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
+            error: errorCreator(
+              'values',
+              errorMessage.NOT_EXISTED_ANSWER_VALUES
+            )
+          });
+          return null;
+        }
+
+        if ((req.body.values as string[]).filter(value => !_.isString(value)).length) {
+          res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
+            error: errorCreator(
+              'values',
+              errorMessage.NOT_ALLOWED_ANSWER_VALUES
+            )
+          });
+          return null;
+        }
+
+        if (qusetion.isCheckBoxType() && req.body.values.length !== 1) {
+          res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
+            error: errorCreator(
+              'values',
+              errorMessage.NOT_ALLOWED_MULTIPLE_VALUES
+            )
+          })
+          return null;
+        }
+      }
+
       Answer.findOne({ userId: req.user.id, questionId: qusetion.id }, (err, answer: AnswerModel): void => {
         if (err) {
           return next(err);
@@ -89,12 +122,14 @@ router.post('/:id/answers', passportConfig.isAuthenticated, (req: Request, res: 
         const newAnswer: Document = (() => {
           if (answer) {
             answer.text = req.body.text;
+            answer.values = req.body.values;
             return answer;
           }
           return new Answer({
             userId: req.user.id,
             questionId: qusetion.id,
             interviewId: qusetion.interviewId,
+            values: req.body.values,
             text: req.body.text,
           })
         })();
@@ -156,7 +191,7 @@ router.post('/:id/answers/:answerId/files', passportConfig.isAuthenticated, mult
         res.status(HttpStatus.UNAUTHORIZED).json({
           error: errorCreator(
             'userId',
-            errorMessage.NOT_ALLOSWD_CREATE_FILE
+            errorMessage.NOT_ALLOWED_CREATE_FILE
           )
         })
         return null;
