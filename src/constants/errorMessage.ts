@@ -31,4 +31,7 @@ export default {
   NOT_EXISTED_ANSWER: '존재하지 않는 답변입니다.',
   NOT_ALLOWED_CREATE_FILE: '파일을 올릴 수 있는 사용자가 아닙니다.',
   TOO_LONG_SESSION_NAME: '이름은 최대 20자까지 가능합니다.',
+  NOT_ALLOWED_PUBLISHING_SESSION: '제출을 할 수 없습니다. 세션 정보에 빈 칸이 있는지 확인해주세요.',
+  NOT_ALLOWED_UPSERT_ANSWER_AFTER_PUBLISHED: '제출을 한 뒤로는 수정할 수 없습니다.',
+  NOT_ALLOWED_UPDATE_SESSION_AFTER_PUBLISHED: '제출을 한 뒤로는 수정할 수 없습니다.',
 }
