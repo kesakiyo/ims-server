@@ -15,13 +15,16 @@ export type SessionModel = mongoose.Document & {
   email: string,
   name: string,
   mobileNumber: string,
+  published: boolean,
   userId: number,
   interviewId: number,
+  publishedAt: number,
   createdAt: number,
   updatedAt: number,
 
   isInterviewee: () => boolean,
   isMaster: () => boolean,
+  isPublished: () =>  boolean,
 };
 
 const SessionSchema: Schema = new mongoose.Schema({
@@ -38,6 +41,10 @@ const SessionSchema: Schema = new mongoose.Schema({
     default: '',
     maxlength: 20,
   },
+  published: {
+    type: Boolean,
+    default: false,
+  },
   mobileNumber: {
     type: String,
     default: '',
@@ -52,6 +59,7 @@ const SessionSchema: Schema = new mongoose.Schema({
     required: true,
     ref: 'User',
   },
+  publishedAt: Number,
 });
 
 SessionSchema.index({
@@ -71,6 +79,10 @@ SessionSchema.methods.isInterviewee = function ():boolean {
 
 SessionSchema.methods.isMaster = function ():boolean {
   return this.role === sessionRole.MASTER;
+}
+
+SessionSchema.methods.isPublished = function ():boolean {
+  return this.published;
 }
 
 const Session: Model<Document> = mongoose.model('Session', SessionSchema);

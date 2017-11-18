@@ -68,6 +68,16 @@ router.post('/:id/answers', passportConfig.isAuthenticated, (req: Request, res: 
         return null;
       }
 
+      if (session.isPublished()) {
+        res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
+          error: errorCreator(
+            'published',
+            errorMessage.NOT_ALLOWED_UPSERT_ANSWER_AFTER_PUBLISHED
+          )
+        });
+        return null;
+      }
+
       if (!qusetion.isTextType()) {
         req.body.text = '';
       }

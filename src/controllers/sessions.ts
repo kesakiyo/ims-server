@@ -11,6 +11,7 @@ import { default as User } from '../models/User';
 import { CustomError, errorCreator } from '../utils/errorUtils';
 import errorMessage from '../constants/errorMessage';
 import sessionValidator from '../middlewares/validators/sessionValidator';
+import { getCurrentTime } from '../utils/timeUtils';
 
 const router: Router = express.Router();
 
@@ -26,7 +27,9 @@ const router: Router = express.Router();
  *            id: 'number',
  *            role: 'string',
  *            userId: 'number',
+ *            published: 'boolean',
  *            interviewId: 'number',
+ *            publishedAt: 'number',
  *            createdAt: 'number',
  *            updatedAt: 'number'
  *        }]
@@ -61,7 +64,9 @@ router.get('/', passportConfig.isAuthenticated, (req: Request, res: Response, ne
  *            id: 'number',
  *            role: 'string',
  *            userId: 'number',
+ *            published: 'boolean',
  *            interviewId: 'number',
+ *            publishedAt: 'boolean',
  *            createdAt: 'number',
  *            updatedAt: 'number'
  *        }
@@ -79,7 +84,7 @@ router.put('/:id', passportConfig.isAuthenticated, sessionValidator, (req: Reque
           'id',
           errorMessage.NOT_EXISTED_SESSION
         )
-      })
+      });
       return null;
     }
 
@@ -89,13 +94,92 @@ router.put('/:id', passportConfig.isAuthenticated, sessionValidator, (req: Reque
           'userId',
           errorMessage.NOT_ALLOWED_UPDATE_SESSION,
         )
-      })
+      });
+      return null;
+    }
+
+    if (session.isPublished()) {
+      res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
+        error: errorCreator(
+          'published',
+          errorMessage.NOT_ALLOWED_UPDATE_SESSION_AFTER_PUBLISHED
+        )
+      });
       return null;
     }
 
     session.email = req.body.email;
     session.name = req.body.name;
     session.mobileNumber = req.body.mobileNumber;
+
+    session.save((err, savedSession: SessionModel) => {
+      if (err) {
+        return next(err);
+      }
+
+      res.status(HttpStatus.OK).json({ session: savedSession });
+    })
+  })
+});
+
+/**
+ * @api {put} /v1/sessions Publishing
+ * @apiGroup Session
+ * @apiName Publishing session
+ * @apiDescription Publishing session
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *    {
+ *        session: {
+ *            id: 'number',
+ *            role: 'string',
+ *            userId: 'number',
+ *            published: 'boolean',
+ *            interviewId: 'number',
+ *            publishedAt: 'number',
+ *            createdAt: 'number',
+ *            updatedAt: 'number'
+ *        }
+ *    }
+ */
+router.put('/:id/publishing', passportConfig.isAuthenticated, (req: Request, res: Response, next: NextFunction): void => {
+  Session.findOne({ id: req.params.id }, (err, session: SessionModel): void => {
+    if (err) {
+      return next(err);
+    }
+
+    if (!session) {
+      res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
+        error: errorCreator(
+          'id',
+          errorMessage.NOT_EXISTED_SESSION
+        )
+      });
+      return null;
+    }
+
+    if (session.userId !== req.user.id) {
+      res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
+        error: errorCreator(
+          'userId',
+          errorMessage.NOT_ALLOWED_UPDATE_SESSION,
+        )
+      });
+      return null;
+    }
+
+    if (!session.email || !session.name || !session.mobileNumber) {
+      res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
+        error: errorCreator(
+          'published',
+          errorMessage.NOT_ALLOWED_PUBLISHING_SESSION
+        )
+      })
+      return null;
+    }
+
+    session.published = true;
+    session.publishedAt = +getCurrentTime();
 
     session.save((err, savedSession: SessionModel) => {
       if (err) {
