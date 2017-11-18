@@ -2,7 +2,7 @@ FROM kesakiyo/ims:server-base
 
 MAINTAINER Minho Cheon <kesakiyo@naver.com>
 
-ENV NODE_ENV development
+ENV NODE_ENV exp
 
 WORKDIR /usr/src/master/ims-server
 

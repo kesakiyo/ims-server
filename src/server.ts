@@ -24,7 +24,7 @@ import passportConfig from './config/passport';
 process.env.TZ = 'Asia/Seoul';
 
 const MONGO_URL = (() => {
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'exp') {
     return secret.MONGO_DEV_URL;
   }
   return secret.MONGO_URL;

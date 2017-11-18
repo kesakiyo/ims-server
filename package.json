@@ -5,8 +5,8 @@
   "main": "./src/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm run build-ts && NODE_ENV=production node dist/server.js",
-    "forever": "npm run build-ts && NODE_ENV=production forever -c 'node' dist/server.js",
+    "start": "npm run build-ts && node dist/server.js",
+    "forever": "npm run build-ts && forever -c 'node' dist/server.js",
     "stop": "forever stopall",
     "serve": "nodemon dist/server.js",
     "build-ts": "tsc",
