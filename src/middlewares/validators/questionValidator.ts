@@ -72,6 +72,7 @@ export default (req: Request, res: Response, next: NextFunction): void => {
         ));
         return null;
       }
+
       if (!_.isArray(values)) {
         errors.push(errorCreator(
           'values',
