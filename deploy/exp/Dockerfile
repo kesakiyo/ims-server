@@ -2,14 +2,14 @@ FROM kesakiyo/ims:server-base
 
 MAINTAINER Minho Cheon <kesakiyo@naver.com>
 
-ENV NODE_ENV production
+ENV NODE_ENV exp
 
 WORKDIR /usr/src/master/ims-server
 
-RUN git checkout master && \
+RUN git checkout exp && \
     git pull && \
     npm install
 
-EXPOSE 3000
+EXPOSE 3001
 
 CMD ["npm", "run", "forever"]

@@ -24,7 +24,7 @@ import passportConfig from './config/passport';
 process.env.TZ = 'Asia/Seoul';
 
 const MONGO_URL = (() => {
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'exp') {
     return secret.MONGO_DEV_URL;
   }
   return secret.MONGO_URL;
@@ -81,7 +81,14 @@ app.use('/v1', ((): Router => {
   return router;
 })());
 
+const PORT = (() => {
+  if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'exp') {
+    return 3001;
+  }
+  return 3000;
+})();
+
 /* Start app */
-app.listen(3000, (): void => {
-  console.log('ims-server app listening on port 3000');
+app.listen(PORT, (): void => {
+  console.log(`ims-server app listening on port ${PORT}`);
 });
