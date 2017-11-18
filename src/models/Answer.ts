@@ -18,6 +18,7 @@ export type AnswerModel = mongoose.Document & {
   _id: string,
   id: number,
   text: string,
+  values: string[],
   file: FileInterface,
   userId: number,
   questionId: number,
@@ -28,6 +29,7 @@ export type AnswerModel = mongoose.Document & {
 
 const AnswerSchema: Schema = new mongoose.Schema({
   text: String,
+  values: [String],
   file: Object,
   userId: {
     type: Number,

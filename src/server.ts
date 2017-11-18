@@ -48,7 +48,7 @@ const MongoStore = connectMongo(session);
 /* Apply Middleware */
 app.use(compression());
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
-app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.json({ limit: '50mb' }));
 app.use(session({
   store: new MongoStore({
     mongooseConnection: mongoose.connection,

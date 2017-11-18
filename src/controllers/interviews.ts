@@ -306,13 +306,14 @@ router.post('/:id/questions', passportConfig.isAuthenticated, questionValidator,
       return null;
     }
 
-    const { title, description, type, limit } = req.body
+    const { title, description, type, values, limit } = req.body
 
     const question: Document = new Question({
       title,
       description,
       type,
       limit,
+      values,
       interviewId: session.interviewId,
     })
 

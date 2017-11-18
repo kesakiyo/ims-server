@@ -14,6 +14,7 @@ export type QuestionModel = mongoose.Document & {
   title: string,
   description: string,
   type: string,
+  values: string[],
   limit: number,
   interviewId: number,
   createdAt: number,
@@ -21,6 +22,8 @@ export type QuestionModel = mongoose.Document & {
 
   isFileType: () => boolean,
   isTextType: () => boolean,
+  isRadioType: () => boolean,
+  isCheckBoxType: () => boolean,
 };
 
 const QuestionSchema: Schema = new mongoose.Schema({
@@ -38,6 +41,7 @@ const QuestionSchema: Schema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  values: [String],
   limit: {
     type: Number,
     max: 10000,
@@ -59,6 +63,14 @@ QuestionSchema.methods.isFileType = function() {
 
 QuestionSchema.methods.isTextType = function() {
   return this.type === questionType.TEXT;
+}
+
+QuestionSchema.methods.isRadioType = function() {
+  return this.type === questionType.RADIO;
+}
+
+QuestionSchema.methods.isCheckBoxType = function() {
+  return this.type === questionType.CHECK_BOX;
 }
 
 const Question: Model<Document> = mongoose.model('Question', QuestionSchema);
