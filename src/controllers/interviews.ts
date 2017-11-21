@@ -16,6 +16,9 @@ import sessionRole from '../constants/sessionRole';
 import { CustomError, errorCreator } from '../utils/errorUtils';
 import errorMessage from '../constants/errorMessage';
 import questionValidator from '../middlewares/validators/questionValidator';
+import interviewFetcher from '../middlewares/fetcher/interviewFetcher';
+import sessionFetcher from '../middlewares/fetcher/sessionFetcher';
+import { ImsRequest } from '../interfaces/express';
 
 const router: Router = express.Router();
 
@@ -162,22 +165,12 @@ router.post('/', passportConfig.isAuthenticated, (req: Request, res: Response, n
  *        }
  *    }
  */
-router.put('/:id/join', passportConfig.isAuthenticated, (req: Request, res: Response, next: NextFunction): void => {
-  Interview.findOne({ id: req.params.id }, (err, interview: InterviewModel): void => {
-    if (err) {
-      return next(err);
-    }
-
-    if (!interview) {
-      res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
-        error: errorCreator(
-          'id',
-          errorMessage.NOT_EXISTED_INTERVIEW,
-        )
-      });
-      return null;
-    }
-
+router.put(
+  '/:id/join',
+  passportConfig.isAuthenticated,
+  interviewFetcher.findOne((req: ImsRequest) => ({ id: req.params.id })),
+  (req: ImsRequest, res: Response, next: NextFunction): void => {
+    const interview = req.interview;
     Session.findOne({ interviewId: interview.id, userId: req.user.id }, (err, session: SessionModel): void => {
       if (err) {
         return next(err);
@@ -218,8 +211,8 @@ router.put('/:id/join', passportConfig.isAuthenticated, (req: Request, res: Resp
         return null;
       })
     })
-  })
-})
+  }
+);
 
 /**
  * @api {get} /v1/interviews/:id/sessions get sessions of interview
@@ -258,7 +251,7 @@ router.get('/:id/sessions', passportConfig.isAuthenticated, (req: Request, res: 
         res.status(HttpStatus.OK).json({ sessions })
       });
   });
-})
+});
 
 /**
  * @api {post} /v1/interviews/:id/questions create question of interview
@@ -280,21 +273,13 @@ router.get('/:id/sessions', passportConfig.isAuthenticated, (req: Request, res: 
  *        }
  *    }
  */
-router.post('/:id/questions', passportConfig.isAuthenticated, questionValidator, (req: Request, res: Response, next: NextFunction): void => {
-  Session.findOne({ userId: req.user.id, interviewId: req.params.id }, (err, session: SessionModel): void => {
-    if (err) {
-      return next(err);
-    }
-
-    if (!session) {
-      res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
-        error: errorCreator(
-          'sessionId',
-          errorMessage.NOT_EXISTED_SESSION
-        )
-      })
-      return null;
-    }
+router.post(
+  '/:id/questions',
+  passportConfig.isAuthenticated,
+  questionValidator,
+  sessionFetcher.findOne((req: ImsRequest) => ({ userId: req.user.id, interviewId: req.params.id })),
+  (req: ImsRequest, res: Response, next: NextFunction): void => {
+    const session = req.imsSession;
 
     if (!session.isMaster()) {
       res.status(HttpStatus.UNAUTHORIZED).json({
@@ -324,8 +309,8 @@ router.post('/:id/questions', passportConfig.isAuthenticated, questionValidator,
 
       res.status(HttpStatus.OK).json({ question: savedQuestion });
     })
-  })
-})
+  }
+);
 
 /**
  * @api {get} /v1/interviews/:id/questions get questions of interview
@@ -357,21 +342,12 @@ router.post('/:id/questions', passportConfig.isAuthenticated, questionValidator,
  *        }]
  *    }
  */
-router.get('/:id/questions', passportConfig.isAuthenticated, (req: Request, res: Response, next: NextFunction): void => {
-  Session.findOne({ interviewId: req.params.id, userId: req.user.id }, (err, session: SessionModel): void => {
-    if (err) {
-      return next(err);
-    }
-
-    if (!session) {
-      res.status(HttpStatus.UNAUTHORIZED).json({
-        error: errorCreator(
-          'role',
-          errorMessage.NOT_ALLOWED_GET_QUESTIONS
-        )
-      })
-      return null;
-    }
+router.get(
+  '/:id/questions',
+  passportConfig.isAuthenticated,
+  sessionFetcher.findOne((req: ImsRequest) => ({ interviewId: req.params.id, userId: req.user.id })),
+  (req: ImsRequest, res: Response, next: NextFunction): void => {
+    const session = req.imsSession;
 
     Question
       .find({ interviewId: req.params.id })
@@ -391,7 +367,7 @@ router.get('/:id/questions', passportConfig.isAuthenticated, (req: Request, res:
             res.status(HttpStatus.OK).json({ questions, answers });
           })
       })
-  })
-});
+  }
+);
 
 export default router;
