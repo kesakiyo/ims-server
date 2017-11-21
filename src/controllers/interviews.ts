@@ -11,7 +11,7 @@ import { default as Interview, InterviewModel } from '../models/Interview';
 import { default as Question, QuestionModel } from '../models/Question';
 import { default as Session, SessionModel } from '../models/Session';
 import { default as Answer, AnswerModel } from '../models/Answer';
-import { default as User } from '../models/User';
+import { default as User, UserModel } from '../models/User';
 import sessionRole from '../constants/sessionRole';
 import { CustomError, errorCreator } from '../utils/errorUtils';
 import errorMessage from '../constants/errorMessage';
@@ -39,14 +39,18 @@ const router: Router = express.Router();
  *            createdAt: number,
  *            updatedAt: number,
  *        ],
- *        sessions: [
+ *        sessions: [{
  *            id: 'number',
  *            role: 'string',
- *            userId: 'number',
- *            interviewId: 'number',
+ *            email: 'string',
+ *            mobileNumber: 'string',
+ *            published: 'boolean',
+ *            userId: 'User',
+ *            interview: 'Interview',
  *            createdAt: 'number',
- *            updatedAt: 'number'
- *        ]
+ *            updatedAt: 'number',
+ *            publishedAt: 'number',
+ *        }]
  *    }
  */
 router.get('/', (req: Request, res: Response, next: NextFunction): void => {
@@ -97,10 +101,14 @@ router.get('/', (req: Request, res: Response, next: NextFunction): void => {
  *        session: {
  *            id: 'number',
  *            role: 'string',
- *            userId: 'number',
- *            interviewId: 'number',
+ *            email: 'string',
+ *            mobileNumber: 'string',
+ *            published: 'boolean',
+ *            userId: 'User',
+ *            interview: 'Interview',
  *            createdAt: 'number',
- *            updatedAt: 'number'
+ *            updatedAt: 'number',
+ *            publishedAt: 'number',
  *        }
  *    }
  */
@@ -158,10 +166,14 @@ router.post('/', passportConfig.isAuthenticated, (req: Request, res: Response, n
  *        session: {
  *            id: 'number',
  *            role: 'string',
+ *            email: 'string',
+ *            mobileNumber: 'string',
+ *            published: 'boolean',
  *            userId: 'User',
  *            interview: 'Interview',
  *            createdAt: 'number',
- *            updatedAt: 'number'
+ *            updatedAt: 'number',
+ *            publishedAt: 'number',
  *        }
  *    }
  */
@@ -222,16 +234,18 @@ router.put(
  *
  * @apiSuccessExample {json} Success-Response:
  *    {
- *        sessions: [
- *            {
- *                id: 'number',
- *                role: 'string',
- *                userId: 'User',
- *                interview: 'Interview',
- *                createdAt: 'number',
- *                updatedAt: 'number'
- *            }
- *        ]
+ *        sessions: [{
+ *            id: 'number',
+ *            role: 'string',
+ *            email: 'string',
+ *            mobileNumber: 'string',
+ *            published: 'boolean',
+ *            userId: 'User',
+ *            interview: 'Interview',
+ *            createdAt: 'number',
+ *            updatedAt: 'number',
+ *            publishedAt: 'number',
+ *        }]
  *    }
  */
 router.get('/:id/sessions', passportConfig.isAuthenticated, (req: Request, res: Response, next: NextFunction): void => {
@@ -369,5 +383,84 @@ router.get(
       })
   }
 );
+
+/**
+ * @api {put} /v1/interviews/:id/invite Invite to the interview
+ * @apiGroup Interview
+ * @apiName Invite interview
+ * @apiDescription Invite to the interview
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *    {
+ *        session: {
+ *            id: 'number',
+ *            role: 'string',
+ *            email: 'string',
+ *            mobileNumber: 'string',
+ *            published: 'boolean',
+ *            userId: 'User',
+ *            interview: 'Interview',
+ *            createdAt: 'number',
+ *            updatedAt: 'number',
+ *            publishedAt: 'number',
+ *        }
+ *    }
+ */
+router.post(
+  '/:id/invite',
+  passportConfig.isAuthenticated,
+  sessionFetcher.findOne((req: ImsRequest) => ({ interviewId: req.params.id, userId: req.user.id })),
+  (req: ImsRequest, res: Response, next: NextFunction): void => {
+    const session = req.imsSession;
+
+    if (!session.isMaster()) {
+      res.status(HttpStatus.UNAUTHORIZED).json({
+        error: errorCreator(
+          'role',
+          errorMessage.NOT_ALLOWED_INVITE_INTERVIEW
+        ),
+      });
+      return null;
+    }
+
+    User.findOne({ email: req.body.email }, (err, existedUser: UserModel): void => {
+      if (err) {
+        return next(err);
+      }
+
+      if (!existedUser) {
+        res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
+          error: errorCreator(
+            'email',
+            errorMessage.NOT_EXISTED_USER
+          ),
+        })
+        return null;
+      }
+
+      if (existedUser.id === req.user.id) {
+        res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
+          error: errorCreator(
+            'email',
+            errorMessage.NOT_ALLOWED_INVITE_SELF
+          ),
+        })
+        return null;
+      }
+
+      Session.findOneAndUpdate(
+        { interviewId: req.params.id, userId: existedUser.id },
+        { role: sessionRole.INTERVIEWER, interviewId: req.params.id, userId: existedUser.id, email: existedUser.email },
+        { upsert: true, new: true },
+        (err, savedSession: SessionModel) => {
+          if (err) {
+            return next(err);
+          }
+
+          res.status(HttpStatus.OK).json({ session: savedSession });
+        });
+    });
+  }
+)
 
 export default router;
