@@ -34,4 +34,7 @@ export default {
   NOT_ALLOWED_PUBLISHING_SESSION: '제출을 할 수 없습니다. 세션 정보에 빈 칸이 있는지 확인해주세요.',
   NOT_ALLOWED_UPSERT_ANSWER_AFTER_PUBLISHED: '제출을 한 뒤로는 수정할 수 없습니다.',
   NOT_ALLOWED_UPDATE_SESSION_AFTER_PUBLISHED: '제출을 한 뒤로는 수정할 수 없습니다.',
+  NOT_ALLOWED_INVITE_INTERVIEW: 'interviewer로 초대는 master만 할 수 있습니다.',
+  NOT_ALLOWED_INVITE_SELF: '자기 자신을 초대할 수 없습니다.',
+  NOT_EXISTED_USER: '존재하지 않는 유저입니다.',
 }
