@@ -39,18 +39,6 @@ const router: Router = express.Router();
  *            createdAt: number,
  *            updatedAt: number,
  *        ],
- *        sessions: [{
- *            id: 'number',
- *            role: 'string',
- *            email: 'string',
- *            mobileNumber: 'string',
- *            published: 'boolean',
- *            userId: 'User',
- *            interview: 'Interview',
- *            createdAt: 'number',
- *            updatedAt: 'number',
- *            publishedAt: 'number',
- *        }]
  *    }
  */
 router.get('/', (req: Request, res: Response, next: NextFunction): void => {
@@ -62,22 +50,7 @@ router.get('/', (req: Request, res: Response, next: NextFunction): void => {
         return next(err);
       }
 
-      Session
-        .find({
-          interviewId: {
-            $in: interviews.map(interview => interview.id),
-          }
-        })
-        .exec((err: Error, sessions: SessionModel[]) => {
-          if (err) {
-            return next(err);
-          }
-
-          res.status(HttpStatus.OK).json({
-            interviews,
-            sessions,
-          });
-        });
+      res.status(HttpStatus.OK).json({ interviews });
     });
 });
 
@@ -189,16 +162,6 @@ router.put(
       }
 
       if (session) {
-        if (!session.isInterviewee()) {
-          res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
-            error: errorCreator(
-              'role',
-              errorMessage.NOT_ALLOWED_JOIN_TO_INTERVIEW,
-            )
-          });
-          return null;
-        }
-
         res.status(HttpStatus.OK).json({ interview, session });
         return null;
       }
@@ -448,17 +411,34 @@ router.post(
         return null;
       }
 
-      Session.findOneAndUpdate(
-        { interviewId: req.params.id, userId: existedUser.id },
-        { role: sessionRole.INTERVIEWER, interviewId: req.params.id, userId: existedUser.id, email: existedUser.email },
-        { upsert: true, new: true },
-        (err, savedSession: SessionModel) => {
+      Session.findOne({ interviewId: req.params.id, userId: existedUser.id }, (err, existedSession: SessionModel): void => {
+        if (err) {
+          return next(err);
+        }
+
+        const newSession = (() => {
+          if (existedSession) {
+            existedSession.role = sessionRole.INTERVIEWER;
+            return existedSession;
+          }
+
+          return new Session({
+            role: sessionRole.INTERVIEWER,
+            email: existedUser.email,
+            interviewId: req.params.id,
+            userId: existedUser.id,
+          })
+        })();
+
+        newSession.save((err, savedSession: SessionModel): void => {
           if (err) {
             return next(err);
           }
 
           res.status(HttpStatus.OK).json({ session: savedSession });
+          return null;
         });
+      })
     });
   }
 )
