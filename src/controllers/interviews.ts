@@ -411,17 +411,34 @@ router.post(
         return null;
       }
 
-      Session.findOneAndUpdate(
-        { interviewId: req.params.id, userId: existedUser.id },
-        { role: sessionRole.INTERVIEWER, interviewId: req.params.id, userId: existedUser.id, email: existedUser.email },
-        { upsert: true, new: true },
-        (err, savedSession: SessionModel) => {
+      Session.findOne({ interviewId: req.params.id, userId: existedUser.id }, (err, existedSession: SessionModel): void => {
+        if (err) {
+          return next(err);
+        }
+
+        const newSession = (() => {
+          if (existedSession) {
+            existedSession.role = sessionRole.INTERVIEWER;
+            return existedSession;
+          }
+
+          return new Session({
+            role: sessionRole.INTERVIEWER,
+            email: existedUser.email,
+            interviewId: req.params.id,
+            userId: existedUser.id,
+          })
+        })();
+
+        newSession.save((err, savedSession: SessionModel): void => {
           if (err) {
             return next(err);
           }
 
           res.status(HttpStatus.OK).json({ session: savedSession });
+          return null;
         });
+      })
     });
   }
 )
