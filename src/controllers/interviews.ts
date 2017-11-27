@@ -419,6 +419,7 @@ router.post(
         const newSession = (() => {
           if (existedSession) {
             existedSession.role = sessionRole.INTERVIEWER;
+            existedSession.published = false;
             return existedSession;
           }
 
