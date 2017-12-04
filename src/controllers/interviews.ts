@@ -12,6 +12,7 @@ import { default as Question, QuestionModel } from '../models/Question';
 import { default as Session, SessionModel } from '../models/Session';
 import { default as Answer, AnswerModel } from '../models/Answer';
 import { default as User, UserModel } from '../models/User';
+import { default as Score, ScoreModel } from '../models/Score';
 import sessionRole from '../constants/sessionRole';
 import { CustomError, errorCreator } from '../utils/errorUtils';
 import errorMessage from '../constants/errorMessage';
@@ -364,23 +365,23 @@ router.get(
     }
 
     Question
-    .find({ interviewId: req.params.id })
-    .sort({ createdAt: 1 })
-    .exec((err, questions: QuestionModel[]): void => {
-      if (err) {
-        return next(err);
-      }
-
-      Answer
-      .find({ userId: req.params.userId, interviewId: req.params.id })
-      .exec((err, answers: AnswerModel[]): void => {
+      .find({ interviewId: req.params.id })
+      .sort({ createdAt: 1 })
+      .exec((err, questions: QuestionModel[]): void => {
         if (err) {
           return next(err);
         }
 
-        res.status(HttpStatus.OK).json({ questions, answers });
+        Answer
+          .find({ userId: req.params.userId, interviewId: req.params.id })
+          .exec((err, answers: AnswerModel[]): void => {
+            if (err) {
+              return next(err);
+            }
+
+            res.status(HttpStatus.OK).json({ questions, answers });
+          });
       });
-    });
   }
 )
 
@@ -480,5 +481,54 @@ router.post(
     });
   }
 )
+
+/**
+ * @api {post} /v1/interviews/:id/users/:id/answers Get scores of user
+ * @apiGroup Interview
+ * @apiName Get scores
+ * @apiDescription Get scores of user
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *    {
+ *        scores: [{
+ *            id: 'number',
+ *            interviewId: 'number',
+ *            questionId: 'number',
+ *            answerId: 'number',
+ *            userId: 'number',
+ *            createdUserId: 'number',
+ *            createdAt: 'number',
+ *            updatedAt: 'number'
+ *        }]
+ *    }
+ */
+router.get(
+  '/:id/users/:userId/scores',
+  passportConfig.isAuthenticated,
+  sessionFetcher.findOne((req: ImsRequest) => ({ userId: req.user.id, interviewId: req.params.id })),
+  (req: ImsRequest, res: Response, next: NextFunction): void => {
+    const session = req.imsSession;
+
+    if (!session.isInterviewer()) {
+      res.status(HttpStatus.UNAUTHORIZED).json({
+        error: errorCreator(
+          'role',
+          errorMessage.NOT_ALLOWED_GET_SCORES
+        )
+      });
+      return null;
+    }
+
+    Score
+      .find({ interviewId: req.params.id, userId: req.params.userId })
+      .exec((err, scores: ScoreModel[]): void => {
+        if (err) {
+          return next(err);
+        }
+
+        res.status(HttpStatus.OK).json({ scores });
+      });
+  }
+);
 
 export default router;
