@@ -24,6 +24,7 @@ export type SessionModel = mongoose.Document & {
 
   isInterviewee: () => boolean,
   isMaster: () => boolean,
+  isInterviewer: () => boolean,
   isPublished: () =>  boolean,
 };
 
@@ -79,6 +80,10 @@ SessionSchema.methods.isInterviewee = function ():boolean {
 
 SessionSchema.methods.isMaster = function ():boolean {
   return this.role === sessionRole.MASTER;
+}
+
+SessionSchema.methods.isInterviewer = function ():boolean {
+  return this.role === sessionRole.MASTER || this.role === sessionRole.INTERVIEWER;
 }
 
 SessionSchema.methods.isPublished = function ():boolean {
