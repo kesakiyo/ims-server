@@ -158,7 +158,7 @@ router.post('/:id/answers', passportConfig.isAuthenticated, (req: Request, res: 
 });
 
 /**
- * @api {post} /v1/answers/:id/file upload file at answer
+ * @api {post} /v1/questions/:id/answers/:answerId/file upload file at answer
  * @apiGroup Answer
  * @apiName Upload file
  * @apiDescription Upload file at answer

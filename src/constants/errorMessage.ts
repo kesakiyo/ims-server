@@ -38,4 +38,6 @@ export default {
   NOT_ALLOWED_INVITE_SELF: '자기 자신을 초대할 수 없습니다.',
   NOT_EXISTED_USER: '존재하지 않는 유저입니다.',
   NOT_ALLOWED_GET_ANSWERS: 'interviewer만 목록을 불러올 수 있습니다.',
+  NOT_ALLOWED_CREATE_SCORE: 'interviewer만 score를 만들 수 있습니다',
+  NOT_ALLOWED_GET_SCORES: 'interviewer만 목록을 불러올 수 있습니다.',
 }
