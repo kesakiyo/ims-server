@@ -37,4 +37,5 @@ export default {
   NOT_ALLOWED_INVITE_INTERVIEW: 'interviewer로 초대는 master만 할 수 있습니다.',
   NOT_ALLOWED_INVITE_SELF: '자기 자신을 초대할 수 없습니다.',
   NOT_EXISTED_USER: '존재하지 않는 유저입니다.',
+  NOT_ALLOWED_GET_ANSWERS: 'interviewer만 목록을 불러올 수 있습니다.',
 }

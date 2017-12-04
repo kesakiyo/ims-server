@@ -347,6 +347,43 @@ router.get(
   }
 );
 
+router.get(
+  '/:id/users/:userId/answers',
+  passportConfig.isAuthenticated,
+  sessionFetcher.findOne((req: ImsRequest) => ({ interviewId: req.params.id, userId: req.user.id })),
+  (req: ImsRequest, res: Response, next: NextFunction): void => {
+    const session = req.imsSession;
+
+    if (!session.isInterviewer()) {
+      res.status(HttpStatus.UNAUTHORIZED).json({
+        error: errorCreator(
+          'role',
+          errorMessage.NOT_ALLOWED_GET_ANSWERS
+        )
+      })
+    }
+
+    Question
+    .find({ interviewId: req.params.id })
+    .sort({ createdAt: 1 })
+    .exec((err, questions: QuestionModel[]): void => {
+      if (err) {
+        return next(err);
+      }
+
+      Answer
+      .find({ userId: req.params.userId, interviewId: req.params.id })
+      .exec((err, answers: AnswerModel[]): void => {
+        if (err) {
+          return next(err);
+        }
+
+        res.status(HttpStatus.OK).json({ questions, answers });
+      });
+    });
+  }
+)
+
 /**
  * @api {put} /v1/interviews/:id/invite Invite to the interview
  * @apiGroup Interview
