@@ -27,9 +27,9 @@ import passportConfig from './config/passport';
 process.env.TZ = 'Asia/Seoul';
 
 const MONGO_URL = (() => {
-  if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'exp') {
-    return secret.MONGO_DEV_URL;
-  }
+  // if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'exp') {
+  //   return secret.MONGO_DEV_URL;
+  // }
   return secret.MONGO_URL;
 })();
 
@@ -69,21 +69,6 @@ app.use(cors({
 }));
 
 passportConfig.initizliaer(passport);
-
-/* Check out of date */
-app.use((req, res, next) => {
-  const current = getCurrentTime();
-  if (current > 1512831599000) {
-    res.status(HttpStatus.UNPROCESSABLE_ENTITY).json({
-      error: errorCreator(
-        'time',
-        '지원이 종료되었습니다.'
-      ),
-    });
-  } else {
-    next();
-  }
-})
 
 /* Setting for router */
 app.use('/v1', ((): Router => {
