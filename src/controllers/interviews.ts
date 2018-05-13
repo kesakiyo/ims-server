@@ -157,9 +157,24 @@ router.put(
   interviewFetcher.findOne((req: ImsRequest) => ({ id: req.params.id })),
   (req: ImsRequest, res: Response, next: NextFunction): void => {
     const interview = req.interview;
+
     Session.findOne({ interviewId: interview.id, userId: req.user.id }, (err, session: SessionModel): void => {
       if (err) {
         return next(err);
+      }
+
+
+      /**
+       * 기간이 지난 인터뷰에 대해 join을 못하게 수정.
+       * 기간이 지났을 때 interviewee나 session이 없으면 join을 못하게 만든다.
+       */
+      const curTime = +(new Date());
+      const isOutOfDate = curTime < interview.startTime || interview.endTime < curTime;
+      if (isOutOfDate && (!session || session.isInterviewee())) {
+        res.status(HttpStatus.BAD_REQUEST).json({
+          message: '기간이 지난 인터뷰입니다.',
+        });
+        return null;
       }
 
       if (session) {
